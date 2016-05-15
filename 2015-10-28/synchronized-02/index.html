@@ -1,0 +1,621 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="fonts.useso.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="synchronized,Java基础," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="一.synchronized(对象) — 对象锁
+&amp;emsp;&amp;emsp;假设类对象instance的某段代码块被synchronized(obj){}包裹，线程访问该段代码块时便会拿到obj对象的内置锁。在obj对象的内置锁释放前，其他线程仍然可以访问instance对象非同步的方法和代码块（现象一），但是： &amp;emsp;&amp;emsp;1. 不能进入任何也以obj为锁的代码块；（现象二）&amp;emsp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="场景一：synchronized包裹代码块">
+<meta property="og:url" content="http://yoursite.com/2015-10-28/synchronized-02/index.html">
+<meta property="og:site_name" content="匠心奉孝">
+<meta property="og:description" content="一.synchronized(对象) — 对象锁
+&amp;emsp;&amp;emsp;假设类对象instance的某段代码块被synchronized(obj){}包裹，线程访问该段代码块时便会拿到obj对象的内置锁。在obj对象的内置锁释放前，其他线程仍然可以访问instance对象非同步的方法和代码块（现象一），但是： &amp;emsp;&amp;emsp;1. 不能进入任何也以obj为锁的代码块；（现象二）&amp;emsp">
+<meta property="og:updated_time" content="2016-05-15T15:02:18.360Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="场景一：synchronized包裹代码块">
+<meta name="twitter:description" content="一.synchronized(对象) — 对象锁
+&amp;emsp;&amp;emsp;假设类对象instance的某段代码块被synchronized(obj){}包裹，线程访问该段代码块时便会拿到obj对象的内置锁。在obj对象的内置锁释放前，其他线程仍然可以访问instance对象非同步的方法和代码块（现象一），但是： &amp;emsp;&amp;emsp;1. 不能进入任何也以obj为锁的代码块；（现象二）&amp;emsp">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 场景一：synchronized包裹代码块 | 匠心奉孝 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">匠心奉孝</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                场景一：synchronized包裹代码块
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2015-10-28T19:03:00+08:00" content="2015-10-28">
+              2015-10-28
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Java基础/" itemprop="url" rel="index">
+                    <span itemprop="name">Java基础</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="一-synchronized-对象-—-对象锁"><a href="#一-synchronized-对象-—-对象锁" class="headerlink" title="一.synchronized(对象) — 对象锁"></a>一.synchronized(对象) — 对象锁</h2><hr>
+<p>&emsp;&emsp;假设类对象instance的某段代码块被synchronized(obj){}包裹，线程访问该段代码块时便会拿到<font color="blue">obj对象</font>的内置锁。<span id="1">在<font color="blue">obj对象</font>的内置锁释放前，其他线程仍然可以访问<font color="blue">instance对象</font>非同步的方法和代码块（现象一）</span>，但是：<br> &emsp;&emsp;<span id="2">1. 不能进入任何也<font color="blue">以obj为锁</font>的代码块；（现象二）</span><br>&emsp;&emsp;<span id="3">2. 当obj与instance是同一个对象时，也不能进入任何<font color="blue">instance对象</font>的同步方法（现象三）</span><br>&emsp;&emsp;由此可见，第一个线程拿到obj对象的内置锁其实就相当于给instance这个对象加上了一个用于同步的独占排他锁（可重入），我们称<font color="blue">obj对象</font>为对象锁。</p>
+<font color="red">&emsp;&emsp;<span id="4">特别说明：对于不同的两个对象，只有当请求的对象锁相同时，线程间才会产生竞争！其他情况下， 并不会互相影响。（现象四）</span></font>
+
+<h2 id=""><a href="#" class="headerlink" title=""></a><a id="more"></a></h2><p><strong>a.验证<a href="#1">现象一</a></strong><br>为类<a href="../synchronized-01/index.html#code">SynchronizedVerify</a>添加如下main()方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args)&#123;</span><br><span class="line">	final SynchronizedVerify sv = new SynchronizedVerify();</span><br><span class="line">	new Thread()&#123;//定为线程一</span><br><span class="line">		public void run() &#123; sv.blockStyle(); &#125;;</span><br><span class="line">	&#125;.start();</span><br><span class="line">	new Thread()&#123;//定为线程二</span><br><span class="line">		public void run() &#123; sv.blockNormal(); &#125;;</span><br><span class="line">	&#125;.start();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sv.blockStyle() 以私有成员ObjA为对象锁</span><br><span class="line">+ sv.blockNormal() 非同步方法且不含同步代码块</span><br><span class="line">输出（无竞争）：</span><br><span class="line">blockStyle:0	|Thread-0</span><br><span class="line">blockNormal:0	|Thread-1</span><br><span class="line">blockStyle:1	|Thread-0</span><br><span class="line">blockNormal:1	|Thread-1</span><br><span class="line">blockNormal:2	|Thread-1</span><br><span class="line">blockStyle:2	|Thread-0</span><br></pre></td></tr></table></figure>
+<hr>
+<p><strong>b.验证<a href="#2">现象二</a></strong><br>为类<a href="../synchronized-01/index.html#code">SynchronizedVerify</a>添加如下main()方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args)&#123;</span><br><span class="line">	final SynchronizedVerify sv = new SynchronizedVerify();</span><br><span class="line">	new Thread()&#123;//定为线程一</span><br><span class="line">		public void run() &#123; sv.blockStyle(); &#125;;</span><br><span class="line">	&#125;.start();</span><br><span class="line">	new Thread()&#123;//定为线程二</span><br><span class="line">		public void run() &#123; sv.blockContrast(); &#125;;</span><br><span class="line">	&#125;.start();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sv.blockStyle() 以私有成员ObjA为对象锁</span><br><span class="line">+ sv.blockContrast() 以私有成员ObjA为对象锁</span><br><span class="line">输出（竞争）：</span><br><span class="line">blockStyle:0	|Thread-0</span><br><span class="line">blockStyle:1	|Thread-0</span><br><span class="line">blockStyle:2	|Thread-0</span><br><span class="line">blockContrast:0	|Thread-1</span><br><span class="line">blockContrast:1	|Thread-1</span><br><span class="line">blockContrast:2	|Thread-1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">将线程二的调用改为sv.blockDiffObj() 以私有成员ObjB为对象锁</span><br><span class="line">sv.blockStyle() + sv.blockDiffObj()输出(无竞争。多尝试几遍，或者加大输出量)：</span><br><span class="line">blockStyle:0	|Thread-0</span><br><span class="line">blockStyle:1	|Thread-0</span><br><span class="line">blockDiffObj:0	|Thread-1</span><br><span class="line">blockStyle:2	|Thread-0</span><br><span class="line">blockDiffObj:1	|Thread-1</span><br><span class="line">blockDiffObj:2	|Thread-1</span><br></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;组合sv.blockStyle() + sv.blockDiffObj()中，两个方法体都用synchronized包裹。但所施加的对象锁一个是objA一个是objB，这是两个对象，所以线程进入两个方法的同步代码块时并不会产生竞争。</p>
+<hr>
+<p><strong>c. 验证<a href="#3">现象三</a></strong><br>为类<a href="../synchronized-01/index.html#code">SynchronizedVerify</a>添加如下main()方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args)&#123;</span><br><span class="line">	final SynchronizedVerify sv = new SynchronizedVerify();</span><br><span class="line">	new Thread()&#123;//定为线程一</span><br><span class="line">		public void run() &#123; sv.blockStyle(); &#125;;</span><br><span class="line">	&#125;.start();</span><br><span class="line">	new Thread()&#123;//定为线程二</span><br><span class="line">		public void run() &#123; sv.methodStyle(); &#125;;</span><br><span class="line">	&#125;.start();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sv.blockStyle() 以私有成员ObjA为对象锁</span><br><span class="line">+ sv.methodStyle() 同步成员方法</span><br><span class="line">输出（无竞争）：</span><br><span class="line">blockStyle:0	|Thread-0</span><br><span class="line">methodStyle:0	|Thread-1</span><br><span class="line">blockStyle:1	|Thread-0</span><br><span class="line">methodStyle:1	|Thread-1</span><br><span class="line">methodStyle:2	|Thread-1</span><br><span class="line">blockStyle:2	|Thread-0</span><br><span class="line"></span><br><span class="line">线程一调用方法改为sv.blockOneself() 以this为对象锁</span><br><span class="line">sv.blockOneself() + sv.methodStyle()输出(竞争)：</span><br><span class="line">blockOneself:0	|Thread-0</span><br><span class="line">blockOneself:1	|Thread-0</span><br><span class="line">blockOneself:2	|Thread-0</span><br><span class="line">methodStyle:0	|Thread-1</span><br><span class="line">methodStyle:1	|Thread-1</span><br><span class="line">methodStyle:2	|Thread-1</span><br></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;当线程进入某个对象的同步方法时，实际上是拿这个对象的内置锁作为对象锁。（详情见<a href="../synchronized-03/index.html">场景二：synchronized修饰方法</a>）<br>&emsp;&emsp;blockOneself()以this为锁锁住代码块，等同于拿当前对象的内置锁作为对象锁。所以当其他线程再进入这个对象的blockOneself()时，因为第一个线程已经独占了对象锁，随后的线程只能阻塞。</p>
+<hr>
+<p><strong>d. 验证<a href="#4">现象四</a></strong><br>&emsp;&emsp;在这里使用类SameObjLockVerify来验证，类定义如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class SameObjLockVerify &#123;</span><br><span class="line">	public static Object staticObj = new Object();</span><br><span class="line">	public void objLock(Object obj)&#123;</span><br><span class="line">		synchronized (obj) &#123; track(&quot;objLock&quot;);&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	public void staticObjLock()&#123;</span><br><span class="line">		synchronized (SameObjLockVerify.staticObj) &#123; track(&quot;staticObjLock&quot;);&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">	/**循环输出一段内容**/</span><br><span class="line">	private static void track(String callerName)&#123;</span><br><span class="line">		for(int i = 0;i &lt; 3 ;i++)</span><br><span class="line">			System.out.println(</span><br><span class="line">					callerName+&quot;:&quot;+i+&quot;\t|&quot;+</span><br><span class="line">					Thread.currentThread().getName());</span><br><span class="line">			</span><br><span class="line">			Thread.yield();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;如果有若干个不同的对象，这些对象中没有一个同步代码块使用与其他对象相同的对象锁。那么多线程访问这些对象，线程间无论如何都不会相互影响。（自行验证）<br>&emsp;&emsp;这里反向模拟现象四，让我们来看看同一个对象obj作对象锁时，不同线程进入不同对象solv1、solv2时有无竞争？</p>
+<p>&emsp;&emsp;为上述SameObjLockVerify类添加如下main方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args)&#123;</span><br><span class="line">	final SameObjLockVerify solv1 = new SameObjLockVerify();</span><br><span class="line">	final SameObjLockVerify solv2 = new SameObjLockVerify();</span><br><span class="line">	final Object objLock = new Object();</span><br><span class="line">		</span><br><span class="line">	new Thread()&#123;//定为线程一</span><br><span class="line">		public void run() &#123; solv1.objLock(objLock); &#125;;</span><br><span class="line">	&#125;.start();</span><br><span class="line">	new Thread()&#123;//定为线程二</span><br><span class="line">		public void run() &#123; solv2.objLock(objLock); &#125;;</span><br><span class="line">	&#125;.start();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">solv1.objLock(objLock)+solv2.objLock(objLock)输出（竞争）:</span><br><span class="line">objLock:0	|Thread-0</span><br><span class="line">objLock:1	|Thread-0</span><br><span class="line">objLock:2	|Thread-0</span><br><span class="line">objLock:0	|Thread-1</span><br><span class="line">objLock:1	|Thread-1</span><br><span class="line">objLock:2	|Thread-1</span><br></pre></td></tr></table></figure>
+<p>或者这样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args)&#123;</span><br><span class="line">	final SameObjLockVerify solv1 = new SameObjLockVerify();</span><br><span class="line">	final SameObjLockVerify solv2 = new SameObjLockVerify();		</span><br><span class="line">	new Thread()&#123;//定为线程一</span><br><span class="line">		public void run() &#123; solv1.staticObjLock(); &#125;;</span><br><span class="line">	&#125;.start();</span><br><span class="line">	new Thread()&#123;//定为线程二</span><br><span class="line">		public void run() &#123; solv2.staticObjLock(); &#125;;</span><br><span class="line">	&#125;.start();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">solv1.staticObjLock() + solv2.staticObjLock()输出（竞争）:</span><br><span class="line">staticObjLock:0	|Thread-0</span><br><span class="line">staticObjLock:1	|Thread-0</span><br><span class="line">staticObjLock:2	|Thread-0</span><br><span class="line">staticObjLock:0	|Thread-1</span><br><span class="line">staticObjLock:1	|Thread-1</span><br><span class="line">staticObjLock:2	|Thread-1</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;即使不是同一个类对象，只要synchronized(对象锁){}使用了相同的对象锁，就会造成多线程的资源竞争。</p>
+<hr>
+<h2 id="二、synchronized-Class对象-—-类锁"><a href="#二、synchronized-Class对象-—-类锁" class="headerlink" title="二、synchronized(Class对象) — 类锁"></a>二、synchronized(Class对象) — 类锁</h2><p>类锁：是相对于对象锁而抽象出来的一种独占排他锁。当线程拿到一个类A的类锁时，其他线程无法访问以类A为锁(A.class)的同步代码块，也无法进入类A的<font color="blue">所有静态同步方法</font>。</p>
+<p>&emsp;&emsp;类锁其实并不真实存在。所谓类锁，实际上是限制对象仅为Class类对象的对象锁。<span id="5"><font color="blue">因此当我们以类A为类锁锁定类A，以类A对象a为对象锁锁定对象a时，两个线程分别访问类A锁定的代码块、对象a锁定的代码块时，并不会产生竞争。</font>(现象五)</span></p>
+<p><strong>a.验证<a href="#5">现象五</a></strong><br>依旧使用类<a href="../synchronized-01/index.html#code">SynchronizedVerify</a>验证，为其添加如下main方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args)&#123;</span><br><span class="line">	final SynchronizedVerify sv = new SynchronizedVerify();</span><br><span class="line">		</span><br><span class="line">	new Thread()&#123;//定为线程一</span><br><span class="line">		public void run() &#123; sv.blockOneself(); &#125;;</span><br><span class="line">	&#125;.start();</span><br><span class="line">	new Thread()&#123;//定为线程二</span><br><span class="line">		public void run() &#123; sv.blockClass();  &#125;;</span><br><span class="line">	&#125;.start();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sv.blockOneself() + sv.blockClass()输出(无竞争):</span><br><span class="line">blockOneself:0	|Thread-0</span><br><span class="line">blockClass:0	|Thread-1</span><br><span class="line">blockClass:1	|Thread-1</span><br><span class="line">blockClass:2	|Thread-1</span><br><span class="line">blockOneself:1	|Thread-0</span><br><span class="line">blockOneself:2	|Thread-0</span><br></pre></td></tr></table></figure>
+<hr>
+<p>&emsp;&emsp;本文的第一部分，已经验证了在synchronized包裹代码块的场景下，若干同步代码块只要synchronized(对象){}设定的锁相同，多线程进入这若干同步代码块就会产生竞争。既然类锁是特殊的对象锁，那么在此便不验证这点。<br>&emsp;&emsp;线程进入同步成员方法，需要申请的是该同步成员方法对应对象的内置锁作为对象锁。<span id="6"><font color="blue">而线程进入同步静态方法，需要申请的是该类对应的Class类对象的内置锁。这使得synchronized(A.class){}代码块 与 A类的同步静态方法前后被多线程访问时，需要申请同一个锁，于是便产生了竞争。</font>（现象六）</span></p>
+<p>b.验证<a href="#6">现象六</a><br>为<a href="../synchronized-01/index.html#code">SynchronizedVerify</a>类添加如下main()方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args)&#123;</span><br><span class="line">	final SynchronizedVerify sv = new SynchronizedVerify();</span><br><span class="line">		</span><br><span class="line">	new Thread()&#123;//定为线程一</span><br><span class="line">		public void run() &#123; sv.blockClass(); &#125;;</span><br><span class="line">	&#125;.start();</span><br><span class="line">	new Thread()&#123;//定为线程二</span><br><span class="line">		public void run() &#123; SynchronizedVerify.methodStatic(); &#125;;</span><br><span class="line">	&#125;.start();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sv.blockClass() + SynchronizedVerify.methodStatic()输出（竞争）:</span><br><span class="line">blockClass:0	|Thread-0</span><br><span class="line">blockClass:1	|Thread-0</span><br><span class="line">blockClass:2	|Thread-0</span><br><span class="line">methodStatic:0	|Thread-1</span><br><span class="line">methodStatic:1	|Thread-1</span><br><span class="line">methodStatic:2	|Thread-1</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/synchronized/" rel="tag">#synchronized</a>
+          
+            <a href="/tags/Java基础/" rel="tag">#Java基础</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015-10-28/synchronized-01/" rel="next" title="synchronized关键词使用场景解析">
+                <i class="fa fa-chevron-left"></i> synchronized关键词使用场景解析
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015-10-28/synchronized-03/" rel="prev" title="场景二：synchronized修饰方法">
+                场景二：synchronized修饰方法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="Lies Su" />
+          <p class="site-author-name" itemprop="name">Lies Su</p>
+          <p class="site-description motion-element" itemprop="description">Material Design重度患者，分散学习主义.</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一-synchronized-对象-—-对象锁"><span class="nav-number">1.</span> <span class="nav-text">一.synchronized(对象) — 对象锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、synchronized-Class对象-—-类锁"><span class="nav-number">3.</span> <span class="nav-text">二、synchronized(Class对象) — 类锁</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lies Su</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>

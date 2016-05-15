@@ -1,0 +1,577 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="fonts.useso.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="5.next()&amp;emsp;&amp;emsp;next()是消息队列中最为核心的方法，Looper从消息队列中取消息就是通过next()实现的。next()保证每次调用都能让Looper得到一个消息，除非消息队列正在退出或者已经废弃（此时返回null）。也就是说如果暂时取不出消息，next()并不会返回！此时为了节省资源，next()会根据消息队列的情况设定阻塞时长然后再阻塞线程。&amp;emsp;&amp;emsp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="匠心奉孝">
+<meta property="og:url" content="http://yoursite.com/2016-05-15/Android线程间通信（二）：MessageQueue（中）/index.html">
+<meta property="og:site_name" content="匠心奉孝">
+<meta property="og:description" content="5.next()&amp;emsp;&amp;emsp;next()是消息队列中最为核心的方法，Looper从消息队列中取消息就是通过next()实现的。next()保证每次调用都能让Looper得到一个消息，除非消息队列正在退出或者已经废弃（此时返回null）。也就是说如果暂时取不出消息，next()并不会返回！此时为了节省资源，next()会根据消息队列的情况设定阻塞时长然后再阻塞线程。&amp;emsp;&amp;emsp">
+<meta property="og:updated_time" content="2016-05-15T13:43:44.784Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="匠心奉孝">
+<meta name="twitter:description" content="5.next()&amp;emsp;&amp;emsp;next()是消息队列中最为核心的方法，Looper从消息队列中取消息就是通过next()实现的。next()保证每次调用都能让Looper得到一个消息，除非消息队列正在退出或者已经废弃（此时返回null）。也就是说如果暂时取不出消息，next()并不会返回！此时为了节省资源，next()会根据消息队列的情况设定阻塞时长然后再阻塞线程。&amp;emsp;&amp;emsp">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title>  | 匠心奉孝 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">匠心奉孝</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-15T19:47:24+08:00" content="2016-05-15">
+              2016-05-15
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="5-next"><a href="#5-next" class="headerlink" title="5.next()"></a>5.next()</h2><p>&emsp;&emsp;next()是消息队列中最为核心的方法，Looper从消息队列中取消息就是通过next()实现的。next()保证每次调用都能让Looper得到一个消息，除非消息队列正在退出或者已经废弃（此时返回null）。也就是说如果暂时取不出消息，next()并不会返回！此时为了节省资源，next()会根据消息队列的情况设定阻塞时长然后再阻塞线程。<br>&emsp;&emsp;消息队列（未退出、未被废弃）在以下四种情况下，next()会选择阻塞线程：<br>&emsp;&emsp;<strong>1）队列中没有任何消息  – 永久阻塞</strong>：这个时候不能返回null，因为next()的目的是取出一个消息，队列中现在没有消息并不代表一段时间后也没有消息。消息队列还在可用中，随时都有可能有Handler发布新的消息给它。那么问题来了，为了节省资源准备阻塞线程但是多少时间后唤醒它呢？臆断一个时长并不是很好的解决方案。我们知道消息队列是用来管理消息的，既然确定不了阻塞时长那么不如先永久阻塞，等新消息入队后主动唤醒线程。<br>&emsp;&emsp;<strong>2）队首的消息执行时间未到  –  定时唤醒</strong>：每个消息的when字段都给出了希望系统处理该消息的时刻。如果在next()方法取消息时，发现消息队列的队首消息处理时间未到，next()同样需要阻塞。因为<font color="blue"><strong>消息队列是按照消息的when字段从小到大排列的</strong></font>，如果队首消息的处理时间都没到那么整个队列中都没有能够立即取出的消息。这个时候因为知道下一次处理的具体时间，结合当前时间就可以确定阻塞时长。<br>&emsp;&emsp;<strong>3）队首消息是同步障碍器（SyncBarrier），并且队列中不含有异步消息 – 永久阻塞</strong>：因为对消息队列施加了同步障碍，所有晚于队首同步障碍器处理时间的同步消息都变得不可用，next()在选取返回消息时会完全忽略这些消息。这和第一种情况相似，所以采取的阻塞方案也是永久阻塞。<br>&emsp;&emsp;<strong>4）队首消息是同步障碍器（SyncBarrier），队列中含有异步消息但执行时间未到 – 定时唤醒</strong>：因为对消息队列施加了同步障碍，所有晚于队首同步障碍器处理时间的同步消息都变得不可用，next()在选取返回消息时会完全忽略这些消息。也就是说对于next()，它只会考虑队列中的异步消息。这和第二种情况相似，所以采取的阻塞方案是设置阻塞时长再阻塞。</p>
+<hr>
+<p>&emsp;&emsp;在这个基础上，我们再以验证的方式来看next()方法的源代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">Message next() &#123;</span><br><span class="line">     final long ptr = mPtr;</span><br><span class="line">     ……（代码略。如果消息循环正在退出或者已经废弃，直接返回null。）</span><br><span class="line">    </span><br><span class="line">     int nextPollTimeoutMillis = 0;  //阻塞时长</span><br><span class="line">     for (;;) &#123;</span><br><span class="line">        ……（不相关内容）</span><br><span class="line">        //nextPollTimeoutMillis为0立即返回，为-1则无限等待(必须主动唤醒)。ptr是指针，涉及本地方法不深究。</span><br><span class="line">        nativePollOnce(ptr, nextPollTimeoutMillis);</span><br><span class="line">        synchronized (this) &#123;</span><br><span class="line">           //now等于自系统启动以来到此时此刻的非深度睡眠时长</span><br><span class="line">           final long now = SystemClock.uptimeMillis();</span><br><span class="line">           Message prevMsg = null;</span><br><span class="line">           Message msg = mMessages; //队首消息</span><br><span class="line"></span><br><span class="line">           //如果当前队首的消息时设置的同步障碍器（target为null）。</span><br><span class="line">           if (msg != null &amp;&amp; msg.target == null) &#123;</span><br><span class="line">               // 因为同步障碍器的原因而进入该分支，找到下一个异步消息之后才会结束while。</span><br><span class="line">               do &#123;</span><br><span class="line">                    prevMsg = msg;</span><br><span class="line">                    msg = msg.next;</span><br><span class="line">               &#125; while (msg != null &amp;&amp; !msg.isAsynchronous());</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            //此时msg一定是普通消息或者null，一定不是同步障碍器</span><br><span class="line">            if (msg != null) &#123; </span><br><span class="line">                    if (now &lt; msg.when) &#123;</span><br><span class="line">                        //队首第一个非障碍器的消息执行时间未到，计算阻塞时长</span><br><span class="line">                        nextPollTimeoutMillis = (int) Math.min(msg.when - now, Integer.MAX_VALUE);</span><br><span class="line">                    &#125; else &#123;//一切正常，开始取消息</span><br><span class="line">                        mBlocked = false;//不阻塞线程</span><br><span class="line">                        if (prevMsg != null) &#123;//如果跳过了队首的同步障碍器取异步消息</span><br><span class="line">                            prevMsg.next = msg.next;</span><br><span class="line">                        &#125; else &#123;//如果当前消息就是队首消息</span><br><span class="line">                            mMessages = msg.next;</span><br><span class="line">                        &#125;</span><br><span class="line">                        msg.next = null;</span><br><span class="line">                        if (false) Log.v(&quot;MessageQueue&quot;, &quot;Returning message: &quot; + msg);</span><br><span class="line">                        return msg;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; else &#123; //消息队列为空，或者队首是SyncBarrier且队列中无异步消息</span><br><span class="line">                    nextPollTimeoutMillis = -1;//-1表示无限等待</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">               //所有待处理的消息均处理完成， 接下来处理闲时任务</span><br><span class="line">               ……（因为当前代码块在无限for循环中，此时再次验证一下消息队列是否正在退出。如果是，则废弃消息队列并返回null。）</span><br><span class="line"></span><br><span class="line">               ……（初始化闲时任务）</span><br><span class="line">               //闲时任务列表为空，或者不是第一次执行到这里</span><br><span class="line">               if (pendingIdleHandlerCount &lt;= 0) &#123;</span><br><span class="line">                   mBlocked = true;</span><br><span class="line">                   continue; </span><br><span class="line">               &#125;</span><br><span class="line">               ……（初始化闲时任务）</span><br><span class="line">            &#125;//synchronized结束</span><br><span class="line"></span><br><span class="line">            ……（如果是本次调用next()过程中第一次到达这里，则执行闲时任务。如果不是第一次，则不会执行到这里）</span><br><span class="line">            //将待处理的IdleHandler个数设置为0，使得本次next()的调用再也不会到达这个for循环。</span><br><span class="line">            pendingIdleHandlerCount = 0;</span><br><span class="line">	</span><br><span class="line">            //因为执行了闲时任务花费了一段时间（迭代开始处的阻塞方法还未执行到所以还未阻塞），此时再根据之前</span><br><span class="line">            //计算出的阻塞时长阻塞线程显然不合适。</span><br><span class="line">            nextPollTimeoutMillis = 0;</span><br><span class="line">        &#125;//for(;;)结束</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;补充一点细节：大家假设队首是同步障碍器时，代码有没有判断过它的处理时间有没有到？</p>
+<hr>
+<h2 id="6-主动唤醒"><a href="#6-主动唤醒" class="headerlink" title="6.主动唤醒"></a><strong>6.主动唤醒</strong></h2><p>&emsp;&emsp;针对上一节提到的四种阻塞情况，我们来分析一下对应情况下什么时候才需要主动唤醒：<br>&emsp;&emsp;<strong>1）队列中没有任何消息  – 永久阻塞</strong>：新消息入队后便主动唤醒线程，无论新消息是同步消息、异步消息还是障碍器。<br>&emsp;&emsp;<strong>2）队首的消息执行时间未到  –  定时唤醒</strong>：如果在阻塞时长未耗尽时，就新加入早于队首消息处理时间的消息，需要主动唤醒线程。<br>&emsp;&emsp;<strong>3）队首消息是同步障碍器（SyncBarrier），并且队列中不含有异步消息 – 永久阻塞</strong>：如果新加入的消息仍然是晚于队首同步障碍器处理时间，那么这次新消息的发布在next()层面上是毫无意义的，我们也不需要唤醒线程。只有在新加入早于队首同步障碍器处理时间的同步消息时，或者，新加入异步消息时（不论处理时间），才会主动唤醒被next()阻塞的线程。<br>&emsp;&emsp;<strong>4）队首消息是同步障碍器（SyncBarrier），队列中含有异步消息但执行时间未到 – 定时唤醒</strong>：因为队首同步障碍器的缘故，无论新加入什么同步消息都不会主动唤醒线程。即使加入的是异步消息也需要其处理时间早于设定好唤醒时执行的异步消息，才会主动唤醒。</p>
+<p>&emsp;&emsp;上面的讨论中，我们只考虑了新增普通消息时，是否需要主动唤醒阻塞中的线程。现在我们来考虑一下，移除普通消息时是否应该唤醒。第一种情况没有消息跳过。第二种情况和第四种情况下，假设我们移除设定好下次被动唤醒时执行的消息，线程被唤醒后就会因为没有需要处理的消息而再次进入阻塞，并不会错过消息所以不需要主动唤醒。第三种情况下移除设定好下次被动唤醒时执行的消息，线程虽然会再次进入阻塞但并不会错过消息，也不需要主动唤醒。所以，<strong>移除普通消息在任何情况下都不需要主动唤醒线程。</strong><br>&emsp;&emsp;如果是新增和移除同步障碍器呢？无论哪种情况，新增的同步障碍器都会在被动唤醒时发挥同步障碍的作用，不会因为没有主动唤醒而多处理不该处理的消息，所以新增同步障碍器之后不需要主动唤醒线程。针对第三种和第四种情况，移除队首障碍器能够使本不可取出的同步消息变得可用，需要主动唤醒线程重新判断是否能够取出消息或者是否需要缩短阻塞时长。<strong>除非新的队首消息还是同步障碍器才不需要唤醒！</strong><br>&emsp;&emsp;至于加长阻塞时长使线程不会被无谓地被动唤醒（因为移除消息或者障碍器），这个设定至少在API22之前还没写入到代码中。</p>
+<hr>
+<p>&emsp;&emsp;就着上面给出的结论，我们来看看Android是怎么实现这些设定的。首先目光回到MessagqeQueue.enqueueMessage()，来看看新增普通消息时是怎么判断是否需要主动唤醒的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">boolean enqueueMessage(Message msg, long when) &#123;</span><br><span class="line">    ……（msg的合法性判断，不合法会终止入队）</span><br><span class="line"></span><br><span class="line">    synchronized (this) &#123;</span><br><span class="line">        ……（判断当前消息队列是否正在退出或者已经废弃）</span><br><span class="line">       msg.markInUse();</span><br><span class="line">       msg.when = when;</span><br><span class="line">       Message p = mMessages;</span><br><span class="line">       boolean needWake;</span><br><span class="line">       //如果队列首部为null，或者入队消息需要马上执行，或者入队消息执行时间早于队首消息，且线程已阻塞则都需要唤醒。</span><br><span class="line">       //如果 p!=null&amp;&amp;when!=0&amp;&amp;when&gt;p.when，则不需要唤醒。</span><br><span class="line">       if (p == null || when == 0 || when &lt; p.when) &#123;</span><br><span class="line">           msg.next = p;</span><br><span class="line">           mMessages = msg;</span><br><span class="line">           needWake = mBlocked;//mBlocked记录消息循环是否阻塞</span><br><span class="line">       &#125; else &#123;</span><br><span class="line">           /*在队列中间插入一个消息。一般情况下不需要唤醒队列（不是加到队首为什么要唤醒呢？），除</span><br><span class="line">            * 非队首是一个同步障碍器而且新插入的消息是 1)异步消息 2)执行时间是队列中最早 时。*/</span><br><span class="line"></span><br><span class="line">           //此处mBlocked值需要根据情况决定。当线程已经阻塞且队首消息是同步障碍器是新加入异步消息，needWake</span><br><span class="line">           //才可能(!!)为true。这还要判断消息队列中是否有异步消息，以及异步消息的处理时间早于还是晚于新加入的异步消息。</span><br><span class="line">           needWake = mBlocked &amp;&amp; p.target == null &amp;&amp; msg.isAsynchronous(); //如果是true也是暂时的，还有考验在等着呢！</span><br><span class="line">           //寻找位置</span><br><span class="line">           Message prev;</span><br><span class="line">           for (;;) &#123;</span><br><span class="line">                prev = p;</span><br><span class="line">                p = p.next;</span><br><span class="line">                if (p == null || when &lt; p.when) &#123;</span><br><span class="line">                   break;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                if (needWake &amp;&amp; p.isAsynchronous()) &#123;</span><br><span class="line">                    //能到达这里，说明msg.when &gt; p.when。既然needWake是true，毫无疑问此时消息队列是</span><br><span class="line">                    //处于阻塞的。这只有一种可能，p这个异步消息的执行时间还没到（情况4）！msg的执行时间还</span><br><span class="line">                    //更晚（不更晚早break了），那就没有必要唤醒消息队列了。</span><br><span class="line">                    needWake = false;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;//for结束</span><br><span class="line"></span><br><span class="line">            //插入新消息</span><br><span class="line">            msg.next = p; // invariant: p == prev.next</span><br><span class="line">            prev.next = msg;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       if (needWake) &#123;</span><br><span class="line">           nativeWake(mPtr);//唤醒消息队列</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return true;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;在这个方法中，出现了一种我们前文都没提到的一种主动唤醒情况  —— when==0（立即执行），实际上这也是毫无疑问需要主动唤醒的一种情况。对于第一种情况，新加入消息肯定需要主动唤醒；对于第二种，不主动唤醒会错过；对于第三、第四种情况，队首的同步障碍器不能影响早于它执行的消息，所以新加入when为0的消息无论如何都能够执行，如果不主动唤醒也会错过！所以，<strong>无论什么情况，只要新入队的消息when字段为0，都要主动唤醒线程！</strong><br>&emsp;&emsp;移除消息的MessageQueue.removeMessages()系列和MessageQueue.removeCallbacksAndMessages()方法，虽然可能导致线程下次被动唤醒时没有消息执行，但是都不会错过消息所以不需要主动唤醒。<br>&emsp;&emsp;接下来目光转到同步障碍器上，MessageQueue.removeSyncBarrier()代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">void removeSyncBarrier(int token) &#123;</span><br><span class="line">        synchronized (this) &#123;</span><br><span class="line">            Message prev = null;</span><br><span class="line">            Message p = mMessages;</span><br><span class="line">            //找到指定的障碍器</span><br><span class="line">            while (p != null &amp;&amp; (p.target != null || p.arg1 != token)) &#123;</span><br><span class="line">                prev = p;</span><br><span class="line">                p = p.next;</span><br><span class="line">            &#125;</span><br><span class="line">            if (p == null) &#123;</span><br><span class="line">                throw new IllegalStateException(&quot;The specified message queue synchronization &quot;</span><br><span class="line">                        + &quot; barrier token has not been posted or has already been removed.&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">            final boolean needWake;</span><br><span class="line">            //如果找到障碍器时，它有前驱消息。说明这个障碍器还没发挥作用，此时无论消息队列是否阻塞</span><br><span class="line">            //都不需要改变其（即消息队列）状态。</span><br><span class="line">            if (prev != null) &#123;</span><br><span class="line">                prev.next = p.next;</span><br><span class="line">                needWake = false;</span><br><span class="line">            &#125; else &#123;//如果障碍器是队首第一个消息</span><br><span class="line">                mMessages = p.next;</span><br><span class="line">                //消息队列为空或者新队首消息不是障碍器时，则唤醒消息队列</span><br><span class="line">                needWake = mMessages == null || mMessages.target != null;</span><br><span class="line">            &#125;</span><br><span class="line">            p.recycleUnchecked();</span><br><span class="line"></span><br><span class="line">            // If the loop is quitting then it is already awake.</span><br><span class="line">            // We can assume mPtr != 0 when mQuitting is false.</span><br><span class="line">            if (needWake &amp;&amp; !mQuitting) &#123;</span><br><span class="line">                nativeWake(mPtr);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;”needWake = mMessages == null || mMessages.target != null”，这个语句含有一种有趣的情况。当消息队列中不含普通消息只含一个同步障碍器时，移除这个障碍器后整个消息队列都空了。按理说，移除之前next()线程已经处于无限阻塞中，移除后再唤醒结果还是无线阻塞。从消息处理上来讲，这是一个可以轻松避免且毫无意义的唤醒。从空闲任务的管理上来讲，next()方法在阻塞线程之前都会执行空闲任务然后再迭代一次判断是否阻塞，阻塞后再唤醒也不可能在本次next()中再执行一次空闲任务，依然是一个可以轻松避免且毫无意义的唤醒。<br>&emsp;&emsp;另外一点是，这段代码并没有融合mBlocked（记录当前线程是否阻塞）变量的值。可能出现线程未阻塞时主动唤醒线程的无谓举动。<br>&emsp;&emsp;这两个问题也许在看到本地方法nativeWake()的定义之后才能解开，暂时留下疑问。</p>
+<h2 id="7-消息队列的退出与废弃"><a href="#7-消息队列的退出与废弃" class="headerlink" title="7.消息队列的退出与废弃"></a><strong>7.消息队列的退出与废弃</strong></h2><p>&emsp;&emsp;当Looper对象退出循环处理时，会调用MessageQueue的同包成员方法quit(safe)通知消息队列开始退出操作。如果boolean型的参数safe是true，消息队列会清除when晚于当前时间的所有同步/异步消息与同步障碍器，留下本应处理完的消息继续处理；如果safe是false，则完全不顾虑，清除消息队列中的所有消息。<br>&emsp;&emsp;在next()方法执行过程中，如果处理完队列中全部消息<strong>后</strong>发现该消息队列的quit()方法被调用过，则直接调用dispose()废弃消息队列并返回null给Looper。当GC回收消息队列之前，会调用消息队列重载的finalize()方法，在这个方法中同样能够执行废弃消息队列的操作（如果还未废弃）。</p>
+<p><strong>注：过段时间再更新下篇，主要是MessageQueue本地方法的介绍。</strong></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016-05-15/Android线程间通信（二）：MessageQueue（上）/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016-05-15/Android线程间通信（四）：Handler/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="Lies Su" />
+          <p class="site-author-name" itemprop="name">Lies Su</p>
+          <p class="site-description motion-element" itemprop="description">Material Design重度患者，分散学习主义.</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-next"><span class="nav-number">1.</span> <span class="nav-text">5.next()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-主动唤醒"><span class="nav-number">2.</span> <span class="nav-text">6.主动唤醒</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-消息队列的退出与废弃"><span class="nav-number">3.</span> <span class="nav-text">7.消息队列的退出与废弃</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lies Su</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>

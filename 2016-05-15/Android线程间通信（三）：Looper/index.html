@@ -1,0 +1,591 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="fonts.useso.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="&amp;emsp;&amp;emsp;Looper类负责循环地从消息队列取消息，并通过消息中的Handler或者Runnable对象完成消息的处理。Looper对象和线程对象是一一对应的，一个线程只能拥有至多（可以没有）一个Looper对象，一个Looper有且只属于一个线程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="匠心奉孝">
+<meta property="og:url" content="http://yoursite.com/2016-05-15/Android线程间通信（三）：Looper/index.html">
+<meta property="og:site_name" content="匠心奉孝">
+<meta property="og:description" content="&amp;emsp;&amp;emsp;Looper类负责循环地从消息队列取消息，并通过消息中的Handler或者Runnable对象完成消息的处理。Looper对象和线程对象是一一对应的，一个线程只能拥有至多（可以没有）一个Looper对象，一个Looper有且只属于一个线程。">
+<meta property="og:updated_time" content="2016-05-15T13:54:39.156Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="匠心奉孝">
+<meta name="twitter:description" content="&amp;emsp;&amp;emsp;Looper类负责循环地从消息队列取消息，并通过消息中的Handler或者Runnable对象完成消息的处理。Looper对象和线程对象是一一对应的，一个线程只能拥有至多（可以没有）一个Looper对象，一个Looper有且只属于一个线程。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title>  | 匠心奉孝 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">匠心奉孝</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-15T19:47:24+08:00" content="2016-05-15">
+              2016-05-15
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>&emsp;&emsp;Looper类负责循环地从消息队列取消息，并通过消息中的Handler或者Runnable对象完成消息的处理。Looper对象和线程对象是一一对应的，一个线程只能拥有至多（可以没有）一个Looper对象，一个Looper有且只属于一个线程。</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a><a id="more"></a></h2><h2 id="1-ThreadLocal类"><a href="#1-ThreadLocal类" class="headerlink" title="1.ThreadLocal类"></a><strong>1.ThreadLocal类</strong></h2><p>&emsp;&emsp;在介绍Looper类之前，我们先简单介绍一下ThreadLocal类。ThreadLocal类更加确切地名称应该是ThreadLocalVariable（线程局部变量）。<br>&emsp;&emsp;假设有一个类A对象a，a中含有int型的成员变量b。当我们用不同的线程在同一个时刻去访问a对象的b值，返回的值都是一样的。当我们用任意一个线程去改变a对象的b值后，其他线程再去读取这个b的值也都是更改后的b值。这样的场景，其实就相当于所有线程共同拥有这个a对象的b值，而不是某一个线程独占它。<br>&emsp;&emsp;如果我们用ThreadLocal去修饰这个成员变量b（ThreadLocal&lt;Integer&gt; b），每个线程在访问a对象的b变量时，就都会得到一个专属于自己的值（支持null）。这就是ThreadLocal类唯一的作用 —— 在线程的范畴内局部化变量。ThreadLocal类的原理基本都类似于使用一个”Thread-变量”的map保存所修饰的变量，在这个例子中ThreadLocal中其实就相当于含有一个Map&lt;Thread，Integer&gt;类型的map成员。具体实现根据JDK版本的不同会有所不同，有用Object数组实现的，有用Map实现的，也有用其他奇淫技巧实现的。<br>&emsp;&emsp;这也就不难理解为什么通过ThreadLocal修饰就能使得多个线程访问同一个对象的成员能够得到专属于自己的值。类似的，一个线程去更改自己专属的变量值，也不会影响到其他任何线程。这就是使得本是所有线程公有的一个成员变量，变成了多个专属于各个线程的成员变量。</p>
+<p>&emsp;&emsp;因为在任意线程中调用Thread.currentThread()方法都能直接得到当前的线程对象，所以ThreadLocal对外的几个方法都没有带入Thread参数：<br>&emsp;&emsp;ThreadLocal.get()：得到当前对象对应的局部变量；<br>&emsp;&emsp;ThreadLocal.set(T)：设置当前对象对应的局部变量；<br>&emsp;&emsp;ThreadLocal.remove()：移除当前对象对应的局部变量。<br>&emsp;&emsp;关于ThreadLocal，有一个作死的做法。我们来看看给两个线程设置同一个对象作为线程局部变量时会发生什么：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">public class VerifyThreadLocal &#123;</span><br><span class="line">	private static int times = 0;</span><br><span class="line">	public ThreadLocal&lt;SimpleItem&gt; ItemTL =new ThreadLocal&lt;SimpleItem&gt;();</span><br><span class="line">	</span><br><span class="line">	 public static void main(String arg[])&#123;</span><br><span class="line">		 final VerifyThreadLocal vtl = new VerifyThreadLocal();</span><br><span class="line">		 final SimpleItem si = vtl.new SimpleItem(&quot;Original text&quot;);</span><br><span class="line">		 new Thread()&#123;</span><br><span class="line">			public void run() &#123;</span><br><span class="line">				vtl.ItemTL.set(si);</span><br><span class="line">				times ++;</span><br><span class="line">				</span><br><span class="line">				while(times !=2)&#123;</span><br><span class="line">					Thread.yield();</span><br><span class="line">				&#125;</span><br><span class="line">				System.out.println(&quot;Thread-1 before ： &quot;+vtl.ItemTL.get().content);</span><br><span class="line">				vtl.ItemTL.get().content = &quot;Alter text&quot;;</span><br><span class="line">				System.out.println(&quot;Thread-1 after ： &quot;+vtl.ItemTL.get().content);</span><br><span class="line">				System.out.println(&quot;Thread-1 Object ： &quot;+vtl.ItemTL.get());</span><br><span class="line">				times++;</span><br><span class="line">			&#125; </span><br><span class="line">		 &#125;.start();</span><br><span class="line">		 </span><br><span class="line">		 new Thread()&#123;</span><br><span class="line">			 public void run() &#123;</span><br><span class="line">				 vtl.ItemTL.set(si);</span><br><span class="line">				 times ++;</span><br><span class="line">					</span><br><span class="line">				 while(times !=3)&#123;</span><br><span class="line">					 Thread.yield();</span><br><span class="line">				 &#125;</span><br><span class="line">				 System.out.println(&quot;Thread-2 ： &quot;+vtl.ItemTL.get().content);</span><br><span class="line">				 System.out.println(&quot;Thread-2 Object ： &quot;+vtl.ItemTL.get());</span><br><span class="line">			 &#125;;</span><br><span class="line">		 &#125;.start();</span><br><span class="line">	 &#125;</span><br><span class="line">	 </span><br><span class="line">	 class SimpleItem &#123;</span><br><span class="line">			public String content;</span><br><span class="line">			</span><br><span class="line">			public SimpleItem(String content) &#123;</span><br><span class="line">				this.content = content;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;当我们在线程1更改其对应的线程局部对象的content值后，线程2取出的值会受影响吗？且看输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Thread-1 before ： Original text</span><br><span class="line">Thread-1 after ： Alter text</span><br><span class="line">Thread-1 Object ： com.threadlocal.verify.VerifyThreadLocal$SimpleItem@8d8474c</span><br><span class="line">Thread-2 ： Alter text</span><br><span class="line">Thread-2 Object ： com.threadlocal.verify.VerifyThreadLocal$SimpleItem@8d8474c</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;作死结束。谨防作死，人人有责。Java的参数传递，除了基本类型外都是传递对象引用的，而非对象本体。当我们把同一个对象引用对应到两个线程时，虽然发生了拷贝但是这两个线程对应的对象引用还是指向同一个对象本体。</p>
+<hr>
+<h2 id="2-Looper-prepare"><a href="#2-Looper-prepare" class="headerlink" title="2.Looper.prepare()"></a><strong>2.Looper.prepare()</strong></h2><p>&emsp;&emsp;Looper对象的构造方法是私有的，我们不能够通过new关键词创建一个Looper。Looper类为我们提供了静态方法Looper.prepare() 用于创建Looper对象，但是这个方法的作用不仅仅在于创建对象，它还完成了一些基本的初始化工作。<br>&emsp;&emsp;我们来看一下它的代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">static final ThreadLocal&lt;Looper&gt; sThreadLocal = new ThreadLocal&lt;Looper&gt;();</span><br><span class="line"> /** 为当前线程创建对应的Looper,应在loop()之前调用。此方法创建的Looper都是可以终止的。**/</span><br><span class="line"> public static void prepare() &#123;</span><br><span class="line">    prepare(true);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> /**每个线程最多只能与一个Looper对应。**/</span><br><span class="line"> private static void prepare(boolean quitAllowed) &#123;</span><br><span class="line">     if (sThreadLocal.get() != null) &#123;</span><br><span class="line">        throw new RuntimeException(&quot;Only one Looper may be created per thread&quot;);</span><br><span class="line">     &#125;</span><br><span class="line">     sThreadLocal.set(new Looper(quitAllowed));</span><br><span class="line"> &#125;</span><br><span class="line"> private Looper(boolean quitAllowed) &#123;</span><br><span class="line">     mQueue = new MessageQueue(quitAllowed);</span><br><span class="line">     mThread = Thread.currentThread();</span><br><span class="line"> &#125;</span><br><span class="line"> //静态方法，在UI线程中调用</span><br><span class="line"> public static void prepareMainLooper() &#123;</span><br><span class="line">        prepare(false);</span><br><span class="line">        synchronized (Looper.class) &#123;</span><br><span class="line">            if (sMainLooper != null) &#123;</span><br><span class="line">                throw new IllegalStateException(&quot;The main Looper has already been prepared.&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">            sMainLooper = myLooper();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;当一个线程需要Looper对象循环处理消息队列时，必须先调用静态方法Looper.prepare()为线程创建与初始化Looper对象。代码中的sThreadLocal是一个静态的线程局部的final变量，每个线程访问这个变量都能得到与之相对应的一个Looper对象。<br>&emsp;&emsp;与普通的线程局部变量（ThreadLocal）不同，Looper类只能在类中创建，并且没有任何方法提供从其他类设置当前线程Looper对象的功能。所以在这里可以说，sThreadLocal这个线程局部变量中每个线程对应的Looper都是不同的（保证了ThreadLocal的作死用法不会在这里发生）。<br>&emsp;&emsp;quitAllowed控制Looper绑定的消息队列是否允许退出，一般的消息队列都允许退出。例外的是，主线程的Looper（也即主Looper）所绑定的消息队列被设置成了不允许退出，这是因为主Looper退出等价于整个应用退出。</p>
+<hr>
+<h2 id="3-loop"><a href="#3-loop" class="headerlink" title="3.loop()"></a><strong>3.loop()</strong></h2><p>&emsp;&emsp;成员方法loop()是Looper类最为关键的方法。loop()方法用一个无限for循环，不断地从消息队列中取消息、分发消息、回收消息，<strong>直到其他线程通过quit()/quitSafely()方法停止消息队列，从而让消息队列的next()返回null以使loop()从无限循环中退出才停止</strong>。其过程大体如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">    * 在当前线程中执行消息循环。确保在当前线程中保存有对应的Looper对象lI，并在调用looper()之后于其</span><br><span class="line">    * 他线程中通过lI.quit()/lI.quitSafely()终止loop()的死循环。</span><br><span class="line">    *</span><br><span class="line">    */</span><br><span class="line">   public static void loop() &#123;</span><br><span class="line">       final Looper me = myLooper();//得到当前线程对应的Looper对象</span><br><span class="line">       if (me == null) &#123;</span><br><span class="line">           throw new RuntimeException(&quot;No Looper; Looper.prepare() wasn&apos;t called on this thread.&quot;);</span><br><span class="line">       &#125;</span><br><span class="line">       final MessageQueue queue = me.mQueue;</span><br><span class="line">       ……</span><br><span class="line">       for (; ; ) &#123;</span><br><span class="line">           Message msg = queue.next(); // 可能产生线程阻塞</span><br><span class="line">           if (msg == null) &#123;</span><br><span class="line">               // 如果msg是null，表示消息队列正在退出或者已经被废弃</span><br><span class="line">               return;</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">           ……（打印日志）</span><br><span class="line">           //执行msg绑定的Runnable 或者 调用target的handleMessage()</span><br><span class="line">           msg.target.dispatchMessage(msg);</span><br><span class="line">           ……（打印日志）</span><br><span class="line">           //不检查状态，直接回收消息</span><br><span class="line">           msg.recycleUnchecked();</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   //Handler.java</span><br><span class="line">   //分发消息给处理程序，callback.run()优先级最高，mCallback.handleMessage(msg)次之，</span><br><span class="line">   //handleMessage(msg)最低。</span><br><span class="line">   public void dispatchMessage(Message msg) &#123;</span><br><span class="line">       if (msg.callback != null) &#123;</span><br><span class="line">           handleCallback(msg);</span><br><span class="line">       &#125; else &#123;</span><br><span class="line">           if (mCallback != null) &#123;</span><br><span class="line">               if (mCallback.handleMessage(msg)) &#123;</span><br><span class="line">                   return;</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">           handleMessage(msg);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;虽然MessageQueue.next()返回null乍一看是没有消息可取出的含义，但是结合上一篇关于MessageQueue.next()的介绍我们可以知道：<strong>next()方法在没有消息可取出的时候，会阻塞线程直到符合条件的消息加入队列中。</strong>并不存在没有消息可取出的情况，真正会返回null的情况是消息队列正在退出（调用了MessageQueue.next()但是内部还未调用dispose）或者已经废弃时。</p>
+<hr>
+<h2 id="4-quit-和quitSafely"><a href="#4-quit-和quitSafely" class="headerlink" title="4.quit()和quitSafely()"></a><strong>4.quit()和quitSafely()</strong></h2><p>&emsp;&emsp;所谓安全退出，实际上就是等待调用时刻本应已处理完的消息真正处理完再退出。这个做法我们在MessageQueue一文中已经介绍过了，MessageQueue.quit()介绍也可以在其中找到。</p>
+<blockquote>
+<p>&emsp;&emsp;当Looper对象退出循环处理时，会调用MessageQueue的同包成员方法quit(safe)通知消息队列开始退出操作。如果boolean型的参数safe是true，消息队列会清除when晚于当前时间的所有同步/异步消息与同步障碍器，留下本应处理完的消息继续处理；如果safe是false，则完全不顾虑，清除消息队列中的所有消息。<br>&emsp;&emsp;在next()方法执行过程中，如果处理完队列中全部消息后发现该消息队列的quit()方法被调用过，则直接调用dispose()废弃消息队列并返回null给Looper。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">  *  终止Looper。如想安全终止Looper，请参考lI.quitSafely()</span><br><span class="line">  * &lt;p&gt;调用该方法将会使得loop(）在下一次循环时立刻终止，无论终止时MessageQueue中是否还有尚未处</span><br><span class="line">  * 理的消息。这之后无论以何种方式发布（post）消息都将会失败，譬如Handler#sendMessage(Message)会</span><br><span class="line">  * 返回false。&lt;/p&gt;</span><br><span class="line">  * &lt;p&gt;</span><br><span class="line">  * 调用这个方法时，可能有一些消息在Looper终止前都不会被交付（delivery） ，因而这个方法并不安全。</span><br><span class="line">  * 考虑使用&#123;@link #quitSafely&#125;方法替代，从而保证所有本应执行完的工作能够有条不紊地执行完再结束Looper。</span><br><span class="line">  * &lt;/p&gt;</span><br><span class="line">  */</span><br><span class="line"> public void quit() &#123;</span><br><span class="line">     mQueue.quit(false);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> /**</span><br><span class="line">  * 安全地终止Looper。</span><br><span class="line">  * 调用该方法后，截止调用时刻的所有消息都能够如常被交付（delivery），而晚于该时刻的消息尽数被丢弃。</span><br><span class="line">  *  一旦处理完符合时刻的所有消息，loop()便会在下一次循环时终止。这之后无论以何种方式发布（post）消息都将</span><br><span class="line">  *  会失败，譬如Handler#sendMessage(Message)会返回false。</span><br><span class="line">  */</span><br><span class="line"> public void quitSafely() &#123;</span><br><span class="line">     mQueue.quit(true);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;调用退出方法让Looper.loop()终止是非常必要的，如果不需要再循环地处理消息时依然让loop()无限循环，将会无意义地消耗大量的资源。</p>
+<hr>
+<h2 id="5-Looper类使用示例"><a href="#5-Looper类使用示例" class="headerlink" title="5.Looper类使用示例"></a><strong>5.Looper类使用示例</strong></h2><p>&emsp;&esmp;源代码中给出了一个简单的Looper类使用示例，有必要贴一下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">class LooperThread extends Thread &#123;</span><br><span class="line">     public Handler mHandler;</span><br><span class="line">     public void run() &#123;</span><br><span class="line">         Looper.prepare(); //创建并绑定Looper</span><br><span class="line">         //注意构造方法参数</span><br><span class="line">         mHandler = new Handler(Looper.myLooper()) &#123;</span><br><span class="line">             public void handleMessage(Message msg) &#123;</span><br><span class="line">                 //默认情况下哪个线程创建Handler，Handler就会与哪个线程的Looper对象绑定。可以在创建</span><br><span class="line">                 //Handler时指定要与其绑定的Looper。Handler发布的消息会在Handler绑定的Looper中被分</span><br><span class="line">                 //发和处理。</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;;</span><br><span class="line">          Looper.loop();//开始消息循环处理</span><br><span class="line">          //消息循环结束后，想要执行的代码段</span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;示例上虽然给我们演示了怎么创建一个线程并且在其run()方法中绑定与使用Looper（这也是值得关注的），但却没有告诉我们怎么退出Looper.loop()的无限循环。<br>&emsp;&emsp;那么到底怎么退出呢？首先我们需要考虑在哪个线程通知Looper.loop()退出，Looper对应的线程已经被loop()占据了不可能再去调用其他方法，所以我们只能：<br>&emsp;&emsp;1）自定义Looper退出消息，让Handler在接收到这个消息时退出自身绑定的Looper；<br>&emsp;&emsp;或者<br>&emsp;&emsp;2）在其他的线程通知loop()退出。其次在其他线程调用Looper的退出方法，必须获取到这个线程对应的Looper对象。这个Looper应该怎么获取呢，Thread没有返回线程对应Looper的方法，Looper倒是有静态方法能够返回当前线程的Looper但是这个Looper并不是我们需要的。这个时候就需要借助Handler类了，前文中已经提过Handler在创建时会与Looper绑定，只要我们能够得到绑定了需要退出的Looper的Handler对象就能够得到需要的Looper，在示例中mHandler对象就承担着这样的职责：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">在其他线程中可使用以下表达式退出正在无限循环的LooperThread对象：</span><br><span class="line">looperThread.mHandler.getLooper().quit();</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="6-主线程Looper"><a href="#6-主线程Looper" class="headerlink" title="6.主线程Looper"></a><strong>6.主线程Looper</strong></h2><p>&emsp;&emsp;我们把主/UI线程对应的Looper叫做主Looper。主Looper是很特别的存在，它有独立的创建方法、有不能够退出的消息队列、能够在任意的线程中被获取，这些都是普通Looper所不具备的特点：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">private static Looper sMainLooper;</span><br><span class="line">/**</span><br><span class="line">   * 为当前线程创建对应的Looper,使用该方法创建的Looper作为整个应用的主Looper，主Looper的消息队列不允许退出。</span><br><span class="line">   * 主Looper应由android系统在UI线程中创建，开发者请勿使用该方法。想要为非主线程创建Looper,请使用</span><br><span class="line">   * Looper.prepare()</span><br><span class="line">   */</span><br><span class="line">public static void prepareMainLooper() &#123;</span><br><span class="line">    prepare(false);</span><br><span class="line">    synchronized (Looper.class) &#123;</span><br><span class="line">        if (sMainLooper != null) &#123;</span><br><span class="line">           throw new IllegalStateException(&quot;The main Looper has already been prepared.&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        sMainLooper = myLooper();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> /**每个线程最多只能与一个Looper对应。**/</span><br><span class="line"> private static void prepare(boolean quitAllowed) &#123;</span><br><span class="line">     if (sThreadLocal.get() != null) &#123;</span><br><span class="line">         throw new RuntimeException(&quot;Only one Looper may be created per thread&quot;);</span><br><span class="line">     &#125;</span><br><span class="line">     sThreadLocal.set(new Looper(quitAllowed));</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;创建主线程的方法同样也是静态方法，与普通Looper的创建不同在于 1）“prepare(false)”语句，它将主Looper的消息队列设置成了不可退出，因为主Looper的消息队列退出意味着应用的结束； 2）这个方法只能由Android系统在UI线程调用，开发者不应调用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">private static Looper sMainLooper;</span><br><span class="line">public static Looper getMainLooper() &#123;</span><br><span class="line">    synchronized (Looper.class) &#123;</span><br><span class="line">        return sMainLooper;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;在UI线程创建主Looper的同时，Looper类用静态成员的形式保存了主Looper，所以<strong>我们可以在任意的线程中使用Looper.getMainLooper()获得主Looper。这使得在非UI线程中，创建与UI线程绑定的Handler成为可能。</strong>要知道，与UI线程绑定的Handler是可以在handleMessage()方法中更新应用界面的。</p>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">相关方法简介：</span><br><span class="line">1.public static Looper myLooper()：获得当前线程绑定的Looper，静态方法；</span><br><span class="line">2.public static MessageQueue myQueue()：获得当前线程的消息队列，静态方法；</span><br><span class="line">3.public Thread getThread()：获得当前Looper对象绑定的线程对象，成员方法；</span><br><span class="line">4.public int postSyncBarrier()：为当前线程的消息队列添加一个when=now的同步障碍器，成员方法；</span><br><span class="line">5.public void removeSyncBarrier(int token)：从当前线程的消息队列中移除一个arg1为token的同步障碍器，成员方法；</span><br><span class="line">6.public boolean isCurrentThread()：判断当前Looper是否与当前线程匹配</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016-05-15/Android线程间通信（补充）：UI线程/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="Lies Su" />
+          <p class="site-author-name" itemprop="name">Lies Su</p>
+          <p class="site-description motion-element" itemprop="description">Material Design重度患者，分散学习主义.</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-ThreadLocal类"><span class="nav-number">2.</span> <span class="nav-text">1.ThreadLocal类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Looper-prepare"><span class="nav-number">3.</span> <span class="nav-text">2.Looper.prepare()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-loop"><span class="nav-number">4.</span> <span class="nav-text">3.loop()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-quit-和quitSafely"><span class="nav-number">5.</span> <span class="nav-text">4.quit()和quitSafely()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Looper类使用示例"><span class="nav-number">6.</span> <span class="nav-text">5.Looper类使用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-主线程Looper"><span class="nav-number">7.</span> <span class="nav-text">6.主线程Looper</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lies Su</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>

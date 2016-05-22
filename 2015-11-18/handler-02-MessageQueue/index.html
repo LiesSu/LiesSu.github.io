@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Android源码分析," />
 
 
 
@@ -84,16 +84,16 @@
 
 
 
-<meta name="description" content="5.next()&amp;emsp;&amp;emsp;next()是消息队列中最为核心的方法，Looper从消息队列中取消息就是通过next()实现的。next()保证每次调用都能让Looper得到一个消息，除非消息队列正在退出或者已经废弃（此时返回null）。也就是说如果暂时取不出消息，next()并不会返回！此时为了节省资源，next()会根据消息队列的情况设定阻塞时长然后再阻塞线程。&amp;emsp;&amp;emsp">
+<meta name="description" content="&amp;emsp;&amp;emsp;MessageQueue（消息队列）是Message（消息）的管理者，它负责保存消息的集合，执行消息入队、出队等操作，同时提供SyncBarrier（同步障碍器）与IdleHandler（闲时任务）机制。SyncBarrier机制允许我们暂停部分Message的出队，而IdleHandler机制允许我们在没有消息需要出队处理时执行一些简单的任务。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="匠心奉孝">
-<meta property="og:url" content="http://yoursite.com/2016-05-15/Android线程间通信（二）：MessageQueue（中）/index.html">
+<meta property="og:title" content="Android线程间通信（二）：MessageQueue">
+<meta property="og:url" content="http://yoursite.com/2015-11-18/handler-02-MessageQueue/index.html">
 <meta property="og:site_name" content="匠心奉孝">
-<meta property="og:description" content="5.next()&amp;emsp;&amp;emsp;next()是消息队列中最为核心的方法，Looper从消息队列中取消息就是通过next()实现的。next()保证每次调用都能让Looper得到一个消息，除非消息队列正在退出或者已经废弃（此时返回null）。也就是说如果暂时取不出消息，next()并不会返回！此时为了节省资源，next()会根据消息队列的情况设定阻塞时长然后再阻塞线程。&amp;emsp;&amp;emsp">
-<meta property="og:updated_time" content="2016-05-15T13:43:44.784Z">
+<meta property="og:description" content="&amp;emsp;&amp;emsp;MessageQueue（消息队列）是Message（消息）的管理者，它负责保存消息的集合，执行消息入队、出队等操作，同时提供SyncBarrier（同步障碍器）与IdleHandler（闲时任务）机制。SyncBarrier机制允许我们暂停部分Message的出队，而IdleHandler机制允许我们在没有消息需要出队处理时执行一些简单的任务。">
+<meta property="og:updated_time" content="2016-05-22T05:48:12.075Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="匠心奉孝">
-<meta name="twitter:description" content="5.next()&amp;emsp;&amp;emsp;next()是消息队列中最为核心的方法，Looper从消息队列中取消息就是通过next()实现的。next()保证每次调用都能让Looper得到一个消息，除非消息队列正在退出或者已经废弃（此时返回null）。也就是说如果暂时取不出消息，next()并不会返回！此时为了节省资源，next()会根据消息队列的情况设定阻塞时长然后再阻塞线程。&amp;emsp;&amp;emsp">
+<meta name="twitter:title" content="Android线程间通信（二）：MessageQueue">
+<meta name="twitter:description" content="&amp;emsp;&amp;emsp;MessageQueue（消息队列）是Message（消息）的管理者，它负责保存消息的集合，执行消息入队、出队等操作，同时提供SyncBarrier（同步障碍器）与IdleHandler（闲时任务）机制。SyncBarrier机制允许我们暂停部分Message的出队，而IdleHandler机制允许我们在没有消息需要出队处理时执行一些简单的任务。">
 
 
 
@@ -111,7 +111,7 @@
   };
 </script>
 
-  <title>  | 匠心奉孝 </title>
+  <title> Android线程间通信（二）：MessageQueue | 匠心奉孝 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -261,7 +261,7 @@
             
             
               
-                
+                Android线程间通信（二）：MessageQueue
               
             
           </h1>
@@ -273,11 +273,42 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-05-15T19:47:24+08:00" content="2016-05-15">
-              2016-05-15
+            <time itemprop="dateCreated" datetime="2015-11-18T14:40:00+08:00" content="2015-11-18">
+              2015-11-18
             </time>
           </span>
 
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/源码分析/" itemprop="url" rel="index">
+                    <span itemprop="name">源码分析</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
           
 
           
@@ -301,7 +332,37 @@
       
 
       
-        <h2 id="5-next"><a href="#5-next" class="headerlink" title="5.next()"></a>5.next()</h2><p>&emsp;&emsp;next()是消息队列中最为核心的方法，Looper从消息队列中取消息就是通过next()实现的。next()保证每次调用都能让Looper得到一个消息，除非消息队列正在退出或者已经废弃（此时返回null）。也就是说如果暂时取不出消息，next()并不会返回！此时为了节省资源，next()会根据消息队列的情况设定阻塞时长然后再阻塞线程。<br>&emsp;&emsp;消息队列（未退出、未被废弃）在以下四种情况下，next()会选择阻塞线程：<br>&emsp;&emsp;<strong>1）队列中没有任何消息  – 永久阻塞</strong>：这个时候不能返回null，因为next()的目的是取出一个消息，队列中现在没有消息并不代表一段时间后也没有消息。消息队列还在可用中，随时都有可能有Handler发布新的消息给它。那么问题来了，为了节省资源准备阻塞线程但是多少时间后唤醒它呢？臆断一个时长并不是很好的解决方案。我们知道消息队列是用来管理消息的，既然确定不了阻塞时长那么不如先永久阻塞，等新消息入队后主动唤醒线程。<br>&emsp;&emsp;<strong>2）队首的消息执行时间未到  –  定时唤醒</strong>：每个消息的when字段都给出了希望系统处理该消息的时刻。如果在next()方法取消息时，发现消息队列的队首消息处理时间未到，next()同样需要阻塞。因为<font color="blue"><strong>消息队列是按照消息的when字段从小到大排列的</strong></font>，如果队首消息的处理时间都没到那么整个队列中都没有能够立即取出的消息。这个时候因为知道下一次处理的具体时间，结合当前时间就可以确定阻塞时长。<br>&emsp;&emsp;<strong>3）队首消息是同步障碍器（SyncBarrier），并且队列中不含有异步消息 – 永久阻塞</strong>：因为对消息队列施加了同步障碍，所有晚于队首同步障碍器处理时间的同步消息都变得不可用，next()在选取返回消息时会完全忽略这些消息。这和第一种情况相似，所以采取的阻塞方案也是永久阻塞。<br>&emsp;&emsp;<strong>4）队首消息是同步障碍器（SyncBarrier），队列中含有异步消息但执行时间未到 – 定时唤醒</strong>：因为对消息队列施加了同步障碍，所有晚于队首同步障碍器处理时间的同步消息都变得不可用，next()在选取返回消息时会完全忽略这些消息。也就是说对于next()，它只会考虑队列中的异步消息。这和第二种情况相似，所以采取的阻塞方案是设置阻塞时长再阻塞。</p>
+        <p>&emsp;&emsp;MessageQueue（消息队列）是Message（消息）的管理者，它负责保存消息的集合，执行消息入队、出队等操作，同时提供SyncBarrier（同步障碍器）与IdleHandler（闲时任务）机制。SyncBarrier机制允许我们暂停部分Message的出队，而IdleHandler机制允许我们在没有消息需要出队处理时执行一些简单的任务。</p>
+<hr>
+<a id="more"></a>
+<h2 id="1-MessageQueue的创建"><a href="#1-MessageQueue的创建" class="headerlink" title="1.MessageQueue的创建"></a><strong>1.MessageQueue的创建</strong></h2><p>消息队列只含一个构造方法，其代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MessageQueue(boolean quitAllowed) &#123;</span><br><span class="line">      mQuitAllowed = quitAllowed;</span><br><span class="line">      mPtr = nativeInit();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;在Java中如果定义类的方法时不设置方法的访问权限，那么方法默认的访问权限不是public，不是private，也不是protected。方法默认的访问权限允许同一个包下的类访问该方法，但不允许子类继承与访问。翻看调用记录可发现，消息队列所在的android.os包下只有Looper类调用过消息队列的构造方法，而消息队列中并没有诸如缓存池之类的结构可以获取已经构造好的消息队列。我们可以断定消息队列是依附在Looper上的消息对象集合，想要获得消息队列必须通过Looper（Looper.myQueue()）。<br>&emsp;&emsp;quitAllowed指定消息队列是否允许退出，其值由Looper类指定，在Looper关联的线程是主线程时才为true（详见<a href="/2015-11-20/handler-03-Looper/">Android线程间通信（三）：Looper</a>）。nativeInit()方法是由C++编写而成的本地方法，计划在一段时间后写MessageQueue（下）介绍相关的本地方法。</p>
+<hr>
+<h2 id="2-SyncBarrier（同步障碍器）"><a href="#2-SyncBarrier（同步障碍器）" class="headerlink" title="2.SyncBarrier（同步障碍器）"></a><strong>2.SyncBarrier（同步障碍器）</strong></h2><p>&emsp;&emsp;先上结论：<font color="blue">SyncBarrier是特殊的消息对象，其特征是target字段为null且arg1字段保存token，其作用是阻碍消息队列使其在处理普通消息时直接跳过位于SyncBarrier后的所有<b> 同步 </b>消息。</font><br>&emsp;&emsp;我们先来看看SyncBarrier是怎么定义的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">    * 将同步障碍器加入消息队列。如果此时消息队列处于阻塞状态也不需要唤醒，因为障碍器本身的目的就是</span><br><span class="line">    * 阻碍消息队列的循环处理。（可以假设一下为什么阻塞，各种阻塞场景下需不需要唤醒）</span><br><span class="line">    * @param when 同步障碍器从何时起效（这个时间是自系统启动开始算起，到指定时间的不包含深度睡</span><br><span class="line">    *             眠的毫秒数）。</span><br><span class="line">    * @return  新增的同步障碍器token，用于&#123;@link #removeSyncBarrier(int) &#125;移除障碍器时使用</span><br><span class="line">    * */</span><br><span class="line">   int enqueueSyncBarrier(long when) &#123;</span><br><span class="line">       synchronized (this) &#123;</span><br><span class="line">           final int token = mNextBarrierToken++;</span><br><span class="line">           //从消息池取出一个消息，并将其设置为同步障碍器（target为null，且arg1保存token的消息）</span><br><span class="line">           final Message msg = Message.obtain();</span><br><span class="line">           msg.markInUse();</span><br><span class="line">           msg.when = when;</span><br><span class="line">           msg.arg1 = token;</span><br><span class="line"></span><br><span class="line">           //找到msg在消息队列中的位置（消息队列按照when从小到大排列），并把msg插入其中</span><br><span class="line">           …………（省略）</span><br><span class="line">           return token;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;看到这里想必大家有一个疑问：难道普通消息的terget不可能是null吗？我们目光移到MessageQueue.enqueueMessage(Message，long)方法上，<b>这个方法是唯一能够从队列外部将一个普通消息加入队列的方法</b>，方法体中的第一行便有这样一段代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if (msg.target == null) &#123;</span><br><span class="line">      throw new IllegalArgumentException(&quot;Message must have a target.&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;如果准备加入队列的Message.target为null，加入操作会抛出异常。因此我们可以断定，消息队列中target为null的消息一定是SyncBarrier。<br>&emsp;&emsp; 带着上面得到的结论，我们在消息队列类中找找看SyncBarrier身影，搜索”target == null”：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">boolean enqueueMessage(Message msg, long when) &#123;</span><br><span class="line">       …………（略）</span><br><span class="line">       needWake = mBlocked &amp;&amp; p.target == null &amp;&amp; msg.isAsynchronous();</span><br><span class="line">       …………（略）         </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp; 这段代码同时涉及到消息队列的阻塞与唤醒，我们稍后再介绍。继续搜索：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"> /**</span><br><span class="line">     *得到下一个等待处理的消息。如果当前消息队列为空或者下一个消息延时时间未到则阻塞线程。</span><br><span class="line">     *</span><br><span class="line">     * @return  &lt;em&gt;null&lt;/em&gt; 消息队列已经退出或者被废弃</span><br><span class="line">     */</span><br><span class="line">Message next() &#123;</span><br><span class="line">   …………（略）</span><br><span class="line">   for (;;) &#123;</span><br><span class="line">      …………（略）</span><br><span class="line">      synchronized (this) &#123;</span><br><span class="line">      // Try to retrieve the next message.  Return if found.</span><br><span class="line">      //now等于自系统启动以来到此时此刻，非深度睡眠的时间</span><br><span class="line">      final long now = SystemClock.uptimeMillis();</span><br><span class="line">      Message prevMsg = null;</span><br><span class="line">      Message msg = mMessages;</span><br><span class="line"></span><br><span class="line">      //如果当前队首的消息时设置的同步障碍器</span><br><span class="line">      if (msg != null &amp;&amp; msg.target == null) &#123;</span><br><span class="line">           // 因为同步障碍器的原因而进入该分支。分支找到下一个异步消息之后才会结束。</span><br><span class="line">           do &#123;</span><br><span class="line">                prevMsg = msg;</span><br><span class="line">                msg = msg.next;</span><br><span class="line">           &#125; while (msg != null &amp;&amp; !msg.isAsynchronous());</span><br><span class="line">      &#125;</span><br><span class="line">      …………（略）</span><br><span class="line">  &#125;//for(;;)结束</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;如果队首是SyncBarrier，next()在寻找下一个待处理的普通消息时遇到同步消息会直接跳过，遇到异步消息才会继续执行。这段代码证实了我们之前的结论。继续搜索”target == null”，除了入队抛异常时又出现了一次外再也没出现过了。</p>
+<p>相关方法：<br>MessageQueue.enqueueSyncBarrier(long)：往消息队列中添加一个SyncBarrier，并返回这个SyncBarrier的token；<br>Looper.postSyncBarrie()：同上；</p>
+<p>MessageQueue.removeSyncBarrier(int)：参数为SyncBarrier的token值，从消息队列中移除指定token的Syncbarrier；<br>Looper.removeSyncBarrier(int)：同上。</p>
+<hr>
+<h2 id="3-同步消息与异步消息"><a href="#3-同步消息与异步消息" class="headerlink" title="3.同步消息与异步消息"></a><strong>3.同步消息与异步消息</strong></h2><p>&emsp;&emsp;前文提到过，同异步消息的区别有两点。第一点，同步消息自始至终都会按照顺序执行（when相同的消息，哪个先入队就先执行哪个），异步消息的执行顺序则完全不确定。第二点，同步消息会同步障碍器拦截而异步消息不会受到影响。<br>&emsp;&emsp;第一点出自官方文档（Message.isAsynchronous()注释），暂未找到可以佐证的代码块。第二点，我们可以从SyncBarrier的工作原理中得到佐证。<br>&emsp;&emsp;通常我们会把中断消息、事件消息等较为重要的Message设置为异步消息，以保证系统能够尽早处理这些消息。</p>
+<hr>
+<h2 id="4-IdleHandler（闲时任务）"><a href="#4-IdleHandler（闲时任务）" class="headerlink" title="4.IdleHandler（闲时任务）"></a><strong>4.IdleHandler（闲时任务）</strong></h2><p>&emsp;&emsp;IdleHandler允许我们在消息队列空闲时执行一些不耗时的简单任务。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 回调接口，当线程准备阻塞以等待更多的消息时调用。</span><br><span class="line"> * 开发者可以实现自己的IdleHandler类，然后通过&#123;@link #addIdleHandler&#125;方法将其添加到消息队列</span><br><span class="line"> * 中。一旦消息队列的循环空闲下来，就会执行这些IdleHandler的</span><br><span class="line"> * &#123;@link IdleHandler#queueIdle IdleHandler.queueIdle()&#125;方法。你可以在这个方法中添加一次操作。</span><br><span class="line">*/</span><br><span class="line">public static interface IdleHandler &#123;</span><br><span class="line"> /**</span><br><span class="line">  * 方法在以下两种情况下会被调用：</span><br><span class="line">  * 1.当消息队列处理完消息开始等待消息时，此时队列为空；</span><br><span class="line">  * 2.当队列中依然有待处理的消息，但这些消息的交付（delivery）时刻要晚于当前时刻时；</span><br><span class="line">  *@return  &lt;em&gt;true&lt;/em&gt; 下次执行&#123;@link #next() next()&#125;如果遇到空闲，依然执</span><br><span class="line">  * 行这个IdleHandler（闲时任务） ； &lt;em&gt;false&lt;/em&gt; 这次IdleHandler执行完之后就把它从闲时任务列表中删除。</span><br><span class="line">  */</span><br><span class="line">  boolean queueIdle();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;我们来看看消息队列是怎么使用IdleHandler的，首先目光转到成员变量上，我们可以发现有这样两个成员：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/**IdleHandler列表**/</span><br><span class="line">private final ArrayList&lt;IdleHandler&gt; mIdleHandlers = new ArrayList&lt;IdleHandler&gt;();</span><br><span class="line">/**保存等待处理的IdleHandler（闲时任务）**/</span><br><span class="line">private IdleHandler[] mPendingIdleHandlers;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;mIdleHandlers可以理解成是一个IdleHandler的总列表，每次next()将要执行IdleHandler时都会从这个总列表中取出所有的IdleHandler。mPendingIdleHandlers指定哪些IdleHandler需要在本次执行中完成，每次next()将要执行IdleHandler时都会从mIdleHandlers拷贝IdleHandler的总列表到mPendingIdleHandlers中。</p>
+<p>下面这一段代码是MessageQueue.next()中用于处理IdleHandler的代码段：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">for (int i = 0; i &lt; pendingIdleHandlerCount; i++) &#123;</span><br><span class="line">   final IdleHandler idler = mPendingIdleHandlers[i];</span><br><span class="line">   mPendingIdleHandlers[i] = null; //待处理任务即将被处理，将其从待处理数组中删去（置空引用）</span><br><span class="line"></span><br><span class="line">   boolean keep = false;</span><br><span class="line">   try &#123;</span><br><span class="line">        keep = idler.queueIdle();</span><br><span class="line">   &#125; catch (Throwable t) &#123;</span><br><span class="line">       Log.wtf(&quot;MessageQueue&quot;, &quot;IdleHandler threw exception&quot;, t);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   if (!keep) &#123;</span><br><span class="line">        synchronized (this) &#123;</span><br><span class="line">              mIdleHandlers.remove(idler);</span><br><span class="line">        &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line">// Reset the idle handler count to 0 so we do not run them again.</span><br><span class="line">pendingIdleHandlerCount = 0;</span><br></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;执行IdleHandler其实就是调用其queueIdle()方法，queueIdle()如果返回false，next()方法会将该IdleHandler从mIdleHandlers中删除。这样的话，下一次next()方法再执行IdleHandler时就不会再重复执行它了。<br>&emsp;&emsp;需要特别提醒的是，虽然next()方法是一个无限for循环，但是每次调用next()都只会执行一次mIdleHandlers中的闲时任务。因为在上面的代码段之前有这样一段：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> if (pendingIdleHandlerCount &lt;= 0) &#123;</span><br><span class="line">    mBlocked = true;</span><br><span class="line">    continue; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>相关方法：<br>MessageQueue.isIdling()：判断当前MessageQueue是否空闲；<br>MessageQueue.addIdleHandler(IdleHandler) ;<br>MessageQueue.removeIdleHandler(IdleHandler)。</p>
+<hr>
+<h2 id="5-next"><a href="#5-next" class="headerlink" title="5.next"></a><strong>5.next</strong></h2><p>&emsp;&emsp;next()是消息队列中最为核心的方法，Looper从消息队列中取消息就是通过next()实现的。next()保证每次调用都能让Looper得到一个消息，除非消息队列正在退出或者已经废弃（此时返回null）。也就是说如果暂时取不出消息，next()并不会返回！此时为了节省资源，next()会根据消息队列的情况设定阻塞时长然后再阻塞线程。<br>&emsp;&emsp;消息队列（未退出、未被废弃）在以下四种情况下，next()会选择阻塞线程：<br>&emsp;&emsp;<strong>1）队列中没有任何消息  – 永久阻塞</strong>：这个时候不能返回null，因为next()的目的是取出一个消息，队列中现在没有消息并不代表一段时间后也没有消息。消息队列还在可用中，随时都有可能有Handler发布新的消息给它。那么问题来了，为了节省资源准备阻塞线程但是多少时间后唤醒它呢？臆断一个时长并不是很好的解决方案。我们知道消息队列是用来管理消息的，既然确定不了阻塞时长那么不如先永久阻塞，等新消息入队后主动唤醒线程。<br>&emsp;&emsp;<strong>2）队首的消息执行时间未到  –  定时唤醒</strong>：每个消息的when字段都给出了希望系统处理该消息的时刻。如果在next()方法取消息时，发现消息队列的队首消息处理时间未到，next()同样需要阻塞。因为<font color="blue"><strong>消息队列是按照消息的when字段从小到大排列的</strong></font>，如果队首消息的处理时间都没到那么整个队列中都没有能够立即取出的消息。这个时候因为知道下一次处理的具体时间，结合当前时间就可以确定阻塞时长。<br>&emsp;&emsp;<strong>3）队首消息是同步障碍器（SyncBarrier），并且队列中不含有异步消息 – 永久阻塞</strong>：因为对消息队列施加了同步障碍，所有晚于队首同步障碍器处理时间的同步消息都变得不可用，next()在选取返回消息时会完全忽略这些消息。这和第一种情况相似，所以采取的阻塞方案也是永久阻塞。<br>&emsp;&emsp;<strong>4）队首消息是同步障碍器（SyncBarrier），队列中含有异步消息但执行时间未到 – 定时唤醒</strong>：因为对消息队列施加了同步障碍，所有晚于队首同步障碍器处理时间的同步消息都变得不可用，next()在选取返回消息时会完全忽略这些消息。也就是说对于next()，它只会考虑队列中的异步消息。这和第二种情况相似，所以采取的阻塞方案是设置阻塞时长再阻塞。</p>
 <hr>
 <p>&emsp;&emsp;在这个基础上，我们再以验证的方式来看next()方法的源代码：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">Message next() &#123;</span><br><span class="line">     final long ptr = mPtr;</span><br><span class="line">     ……（代码略。如果消息循环正在退出或者已经废弃，直接返回null。）</span><br><span class="line">    </span><br><span class="line">     int nextPollTimeoutMillis = 0;  //阻塞时长</span><br><span class="line">     for (;;) &#123;</span><br><span class="line">        ……（不相关内容）</span><br><span class="line">        //nextPollTimeoutMillis为0立即返回，为-1则无限等待(必须主动唤醒)。ptr是指针，涉及本地方法不深究。</span><br><span class="line">        nativePollOnce(ptr, nextPollTimeoutMillis);</span><br><span class="line">        synchronized (this) &#123;</span><br><span class="line">           //now等于自系统启动以来到此时此刻的非深度睡眠时长</span><br><span class="line">           final long now = SystemClock.uptimeMillis();</span><br><span class="line">           Message prevMsg = null;</span><br><span class="line">           Message msg = mMessages; //队首消息</span><br><span class="line"></span><br><span class="line">           //如果当前队首的消息时设置的同步障碍器（target为null）。</span><br><span class="line">           if (msg != null &amp;&amp; msg.target == null) &#123;</span><br><span class="line">               // 因为同步障碍器的原因而进入该分支，找到下一个异步消息之后才会结束while。</span><br><span class="line">               do &#123;</span><br><span class="line">                    prevMsg = msg;</span><br><span class="line">                    msg = msg.next;</span><br><span class="line">               &#125; while (msg != null &amp;&amp; !msg.isAsynchronous());</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            //此时msg一定是普通消息或者null，一定不是同步障碍器</span><br><span class="line">            if (msg != null) &#123; </span><br><span class="line">                    if (now &lt; msg.when) &#123;</span><br><span class="line">                        //队首第一个非障碍器的消息执行时间未到，计算阻塞时长</span><br><span class="line">                        nextPollTimeoutMillis = (int) Math.min(msg.when - now, Integer.MAX_VALUE);</span><br><span class="line">                    &#125; else &#123;//一切正常，开始取消息</span><br><span class="line">                        mBlocked = false;//不阻塞线程</span><br><span class="line">                        if (prevMsg != null) &#123;//如果跳过了队首的同步障碍器取异步消息</span><br><span class="line">                            prevMsg.next = msg.next;</span><br><span class="line">                        &#125; else &#123;//如果当前消息就是队首消息</span><br><span class="line">                            mMessages = msg.next;</span><br><span class="line">                        &#125;</span><br><span class="line">                        msg.next = null;</span><br><span class="line">                        if (false) Log.v(&quot;MessageQueue&quot;, &quot;Returning message: &quot; + msg);</span><br><span class="line">                        return msg;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; else &#123; //消息队列为空，或者队首是SyncBarrier且队列中无异步消息</span><br><span class="line">                    nextPollTimeoutMillis = -1;//-1表示无限等待</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">               //所有待处理的消息均处理完成， 接下来处理闲时任务</span><br><span class="line">               ……（因为当前代码块在无限for循环中，此时再次验证一下消息队列是否正在退出。如果是，则废弃消息队列并返回null。）</span><br><span class="line"></span><br><span class="line">               ……（初始化闲时任务）</span><br><span class="line">               //闲时任务列表为空，或者不是第一次执行到这里</span><br><span class="line">               if (pendingIdleHandlerCount &lt;= 0) &#123;</span><br><span class="line">                   mBlocked = true;</span><br><span class="line">                   continue; </span><br><span class="line">               &#125;</span><br><span class="line">               ……（初始化闲时任务）</span><br><span class="line">            &#125;//synchronized结束</span><br><span class="line"></span><br><span class="line">            ……（如果是本次调用next()过程中第一次到达这里，则执行闲时任务。如果不是第一次，则不会执行到这里）</span><br><span class="line">            //将待处理的IdleHandler个数设置为0，使得本次next()的调用再也不会到达这个for循环。</span><br><span class="line">            pendingIdleHandlerCount = 0;</span><br><span class="line">	</span><br><span class="line">            //因为执行了闲时任务花费了一段时间（迭代开始处的阻塞方法还未执行到所以还未阻塞），此时再根据之前</span><br><span class="line">            //计算出的阻塞时长阻塞线程显然不合适。</span><br><span class="line">            nextPollTimeoutMillis = 0;</span><br><span class="line">        &#125;//for(;;)结束</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
@@ -317,6 +378,7 @@
 <p>&emsp;&emsp;”needWake = mMessages == null || mMessages.target != null”，这个语句含有一种有趣的情况。当消息队列中不含普通消息只含一个同步障碍器时，移除这个障碍器后整个消息队列都空了。按理说，移除之前next()线程已经处于无限阻塞中，移除后再唤醒结果还是无线阻塞。从消息处理上来讲，这是一个可以轻松避免且毫无意义的唤醒。从空闲任务的管理上来讲，next()方法在阻塞线程之前都会执行空闲任务然后再迭代一次判断是否阻塞，阻塞后再唤醒也不可能在本次next()中再执行一次空闲任务，依然是一个可以轻松避免且毫无意义的唤醒。<br>&emsp;&emsp;另外一点是，这段代码并没有融合mBlocked（记录当前线程是否阻塞）变量的值。可能出现线程未阻塞时主动唤醒线程的无谓举动。<br>&emsp;&emsp;这两个问题也许在看到本地方法nativeWake()的定义之后才能解开，暂时留下疑问。</p>
 <h2 id="7-消息队列的退出与废弃"><a href="#7-消息队列的退出与废弃" class="headerlink" title="7.消息队列的退出与废弃"></a><strong>7.消息队列的退出与废弃</strong></h2><p>&emsp;&emsp;当Looper对象退出循环处理时，会调用MessageQueue的同包成员方法quit(safe)通知消息队列开始退出操作。如果boolean型的参数safe是true，消息队列会清除when晚于当前时间的所有同步/异步消息与同步障碍器，留下本应处理完的消息继续处理；如果safe是false，则完全不顾虑，清除消息队列中的所有消息。<br>&emsp;&emsp;在next()方法执行过程中，如果处理完队列中全部消息<strong>后</strong>发现该消息队列的quit()方法被调用过，则直接调用dispose()废弃消息队列并返回null给Looper。当GC回收消息队列之前，会调用消息队列重载的finalize()方法，在这个方法中同样能够执行废弃消息队列的操作（如果还未废弃）。</p>
 <p><strong>注：过段时间再更新下篇，主要是MessageQueue本地方法的介绍。</strong></p>
+<hr>
 
       
     </div>
@@ -336,21 +398,27 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/Android源码分析/" rel="tag">#Android源码分析</a>
+          
+        </div>
+      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016-05-15/Android线程间通信（二）：MessageQueue（上）/" rel="next" title="">
-                <i class="fa fa-chevron-left"></i> 
+              <a href="/2015-11-18/handler-01-Message/" rel="next" title="Android线程间通信（一）：Message">
+                <i class="fa fa-chevron-left"></i> Android线程间通信（一）：Message
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016-05-15/Android线程间通信（四）：Handler/" rel="prev" title="">
-                 <i class="fa fa-chevron-right"></i>
+              <a href="/2015-11-20/handler-03-Looper/" rel="prev" title="Android线程间通信（三）：Looper">
+                Android线程间通信（三）：Looper <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -419,7 +487,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-count">9</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -427,7 +495,7 @@
           
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -465,7 +533,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-next"><span class="nav-number">1.</span> <span class="nav-text">5.next()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-主动唤醒"><span class="nav-number">2.</span> <span class="nav-text">6.主动唤醒</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-消息队列的退出与废弃"><span class="nav-number">3.</span> <span class="nav-text">7.消息队列的退出与废弃</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-MessageQueue的创建"><span class="nav-number">1.</span> <span class="nav-text">1.MessageQueue的创建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-SyncBarrier（同步障碍器）"><span class="nav-number">2.</span> <span class="nav-text">2.SyncBarrier（同步障碍器）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-同步消息与异步消息"><span class="nav-number">3.</span> <span class="nav-text">3.同步消息与异步消息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-IdleHandler（闲时任务）"><span class="nav-number">4.</span> <span class="nav-text">4.IdleHandler（闲时任务）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-next"><span class="nav-number">5.</span> <span class="nav-text">5.next</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-主动唤醒"><span class="nav-number">6.</span> <span class="nav-text">6.主动唤醒</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-消息队列的退出与废弃"><span class="nav-number">7.</span> <span class="nav-text">7.消息队列的退出与废弃</span></a></li></ol></div>
             
           </div>
         </section>

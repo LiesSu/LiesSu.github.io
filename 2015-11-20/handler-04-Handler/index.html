@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Android源码分析," />
 
 
 
@@ -86,13 +86,13 @@
 
 <meta name="description" content="&amp;emsp;&amp;emsp;在Android整个线程间通信的结构中，Message是通信内容的载体，MessageQueue是Message的管理者，Looper负责从MessageQueue中循环地取消息并分发给对应Handler处理，而Handler是Message的发布者兼处理者。Handler是实现线程间通信的关键，任何从其他线程发往本线程的消息都要通过Handler发送。Handler在创建">
 <meta property="og:type" content="article">
-<meta property="og:title" content="匠心奉孝">
-<meta property="og:url" content="http://yoursite.com/2016-05-15/Android线程间通信（四）：Handler/index.html">
+<meta property="og:title" content="Android线程间通信（四）：Handler">
+<meta property="og:url" content="http://yoursite.com/2015-11-20/handler-04-Handler/index.html">
 <meta property="og:site_name" content="匠心奉孝">
 <meta property="og:description" content="&amp;emsp;&amp;emsp;在Android整个线程间通信的结构中，Message是通信内容的载体，MessageQueue是Message的管理者，Looper负责从MessageQueue中循环地取消息并分发给对应Handler处理，而Handler是Message的发布者兼处理者。Handler是实现线程间通信的关键，任何从其他线程发往本线程的消息都要通过Handler发送。Handler在创建">
-<meta property="og:updated_time" content="2016-05-15T13:46:27.827Z">
+<meta property="og:updated_time" content="2016-05-22T05:51:44.770Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="匠心奉孝">
+<meta name="twitter:title" content="Android线程间通信（四）：Handler">
 <meta name="twitter:description" content="&amp;emsp;&amp;emsp;在Android整个线程间通信的结构中，Message是通信内容的载体，MessageQueue是Message的管理者，Looper负责从MessageQueue中循环地取消息并分发给对应Handler处理，而Handler是Message的发布者兼处理者。Handler是实现线程间通信的关键，任何从其他线程发往本线程的消息都要通过Handler发送。Handler在创建">
 
 
@@ -111,7 +111,7 @@
   };
 </script>
 
-  <title>  | 匠心奉孝 </title>
+  <title> Android线程间通信（四）：Handler | 匠心奉孝 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -261,7 +261,7 @@
             
             
               
-                
+                Android线程间通信（四）：Handler
               
             
           </h1>
@@ -273,11 +273,42 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-05-15T19:47:24+08:00" content="2016-05-15">
-              2016-05-15
+            <time itemprop="dateCreated" datetime="2015-11-20T16:14:00+08:00" content="2015-11-20">
+              2015-11-20
             </time>
           </span>
 
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/源码分析/" itemprop="url" rel="index">
+                    <span itemprop="name">源码分析</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
           
 
           
@@ -303,6 +334,7 @@
       
         <p>&emsp;&emsp;在Android整个线程间通信的结构中，Message是通信内容的载体，MessageQueue是Message的管理者，Looper负责从MessageQueue中循环地取消息并分发给对应Handler处理，而Handler是Message的发布者兼处理者。<br>Handler是实现线程间通信的关键，任何从其他线程发往本线程的消息都要通过Handler发送。Handler在创建时会默认绑定本线程的Looper，这是Handler发出的消息能够被本线程接收的关键。</p>
 <hr>
+<a id="more"></a>
 <h2 id="1-创建Handler"><a href="#1-创建Handler" class="headerlink" title="1.创建Handler"></a><strong>1.创建Handler</strong></h2><p>&emsp;&emsp;Handler一共有7个构造方法，使用时根据需要指定的参数确定调用哪个构造方法即可。我们先看其中5个只用于简化参数的构造方法：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public Handler() &#123;</span><br><span class="line">   this(null, false); //Handler(Callback callback, boolean async)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public Handler(Callback callback) &#123;</span><br><span class="line">   this(callback, false); //Handler(Callback callback, boolean async)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public Handler(Looper looper) &#123;</span><br><span class="line">   this(looper, null, false); //Handler(Looper looper, Callback callback, boolean async)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public Handler(Looper looper, Callback callback) &#123;</span><br><span class="line">    this(looper, callback, false); //Handler(Looper looper, Callback callback, boolean async)</span><br><span class="line">&#125;</span><br><span class="line">public Handler(boolean async) &#123;</span><br><span class="line">    this(null, async); //Handler(Callback callback, boolean async)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>&esmp;&emsp;这五5个构造方法其实最后都是通过下面两个构造方法完成构造的：</p>
@@ -334,7 +366,7 @@
 </code></pre></blockquote>
 <p>&emsp;&emsp;追踪上述方法的调用关系，可以发现最终都会调用enqueueMessage()。这个方法负责把上层方法封装好的消息加上target和同异步标识，并加入Handler对应的消息队列中。其代码如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">private boolean enqueueMessage(MessageQueue queue, Message msg, long uptimeMillis) &#123;</span><br><span class="line">     msg.target = this;</span><br><span class="line">     if (mAsynchronous) &#123;</span><br><span class="line">        msg.setAsynchronous(true);</span><br><span class="line">     &#125;</span><br><span class="line">     return queue.enqueueMessage(msg, uptimeMillis);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>&emsp;&emsp;在创建Handler时可以指定Handler是同步的还是异步的（保存在mAsynchronous），<strong>如果Handler是异步的，在enqueueMessage会将发送的所有消息都设置成异步消息。</strong><br>&emsp;&emsp;queue.enqueueMessage(msg, uptimeMillis)返回的入队结果会一层一层往上反馈。为了保证消息能够被处理，在发送消息后应该考虑发送失败的情况并制定相应的对策。MessageQueue.enqueueMessage()在<a href="http://blog.csdn.net/tear2210/article/details/49815181#t1" target="_blank" rel="external">Android线程间通信（二）：MessageQueue（中）  </a>中已经分功能解读过了，在这里就不再累述。<strong>当Handler将消息从其他线程入队到对应的消息队列那一刻，也是消息从其他线程移交本线程的一刻。</strong>之后消息的分派、处理和大部分管理操作都在本线程中完成。</p>
+<p>&emsp;&emsp;在创建Handler时可以指定Handler是同步的还是异步的（保存在mAsynchronous），<strong>如果Handler是异步的，在enqueueMessage会将发送的所有消息都设置成异步消息。</strong><br>&emsp;&emsp;queue.enqueueMessage(msg, uptimeMillis)返回的入队结果会一层一层往上反馈。为了保证消息能够被处理，在发送消息后应该考虑发送失败的情况并制定相应的对策。MessageQueue.enqueueMessage()在<a href="/2015-11-18/handler-02-MessageQueue/">Android线程间通信（二）：MessageQueue（中）  </a>中已经分功能解读过了，在这里就不再累述。<strong>当Handler将消息从其他线程入队到对应的消息队列那一刻，也是消息从其他线程移交本线程的一刻。</strong>之后消息的分派、处理和大部分管理操作都在本线程中完成。</p>
 <hr>
 <h2 id="3-消息的分发与处理-Callback接口"><a href="#3-消息的分发与处理-Callback接口" class="headerlink" title="3.消息的分发与处理 Callback接口"></a><strong>3.消息的分发与处理 Callback接口</strong></h2><p>&emsp;&emsp;Handler把消息发给消息队列后，消息队列就承担起了消息的管理工作。消息队列在合适的时机会将消息传递给Looper；Looper得到消息后能够从消息中得到其对应的Handler对象，并通过该Handler的dispatchMessage()方法将消息分派给Handler处理；Handler从分派方法中得到消息后，能够根据消息携带的参数指定不同的方法来完成消息的处理。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public void dispatchMessage(Message msg) &#123;</span><br><span class="line">   if (msg.callback != null) &#123;</span><br><span class="line">      handleCallback(msg); //函数体为：message.callback.run();</span><br><span class="line">   &#125; else &#123;</span><br><span class="line">      if (mCallback != null) &#123;</span><br><span class="line">          if (mCallback.handleMessage(msg)) &#123;</span><br><span class="line">             return;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      handleMessage(msg);</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -374,21 +406,27 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/Android源码分析/" rel="tag">#Android源码分析</a>
+          
+        </div>
+      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016-05-15/Android线程间通信（二）：MessageQueue（中）/" rel="next" title="">
-                <i class="fa fa-chevron-left"></i> 
+              <a href="/2015-11-20/handler-03-Looper/" rel="next" title="Android线程间通信（三）：Looper">
+                <i class="fa fa-chevron-left"></i> Android线程间通信（三）：Looper
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016-05-15/Android线程间通信（补充）：UI线程/" rel="prev" title="">
-                 <i class="fa fa-chevron-right"></i>
+              <a href="/2015-11-20/handler-05-append/" rel="prev" title="Android线程间通信（补充）：UI线程">
+                Android线程间通信（补充）：UI线程 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -457,7 +495,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-count">9</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -465,7 +503,7 @@
           
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>

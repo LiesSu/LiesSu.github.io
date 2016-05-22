@@ -88,11 +88,11 @@
 1.通信内容 – arg1+arg2+obj 或者 data字段  &amp;emsp;&amp;emsp;希望接收通信的线程得到哪些数据，我们就往消息对象中存放哪些数据。在消息类中，提供了低消耗和高消耗两种内容存放方案：">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android线程间通信（一）：Message">
-<meta property="og:url" content="http://yoursite.com/2015-11-18/Android线程间通信（一）：Message/index.html">
+<meta property="og:url" content="http://yoursite.com/2015-11-18/handler-01-Message/index.html">
 <meta property="og:site_name" content="匠心奉孝">
 <meta property="og:description" content="&amp;emsp;&amp;emsp;Message（消息）类是通信内容的载体。线程间的通信包含哪些数据、是什么目的、是异步还是同步、要求什么时候执行其中封装的操作等等信息，都是由Message来保存。
 1.通信内容 – arg1+arg2+obj 或者 data字段  &amp;emsp;&amp;emsp;希望接收通信的线程得到哪些数据，我们就往消息对象中存放哪些数据。在消息类中，提供了低消耗和高消耗两种内容存放方案：">
-<meta property="og:updated_time" content="2016-05-22T03:33:12.031Z">
+<meta property="og:updated_time" content="2016-05-22T05:51:37.910Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android线程间通信（一）：Message">
 <meta name="twitter:description" content="&amp;emsp;&amp;emsp;Message（消息）类是通信内容的载体。线程间的通信包含哪些数据、是什么目的、是异步还是同步、要求什么时候执行其中封装的操作等等信息，都是由Message来保存。
@@ -338,6 +338,7 @@
         <p>&emsp;&emsp;Message（消息）类是通信内容的载体。线程间的通信包含哪些数据、是什么目的、是异步还是同步、要求什么时候执行其中封装的操作等等信息，都是由Message来保存。</p>
 <h2 id="1-通信内容-–-arg1-arg2-obj-或者-data字段"><a href="#1-通信内容-–-arg1-arg2-obj-或者-data字段" class="headerlink" title="1.通信内容 – arg1+arg2+obj 或者 data字段"></a><strong>1.通信内容</strong> <font size="4">– arg1+arg2+obj 或者 data字段</font></h2><p>  &emsp;&emsp;希望接收通信的线程得到哪些数据，我们就往消息对象中存放哪些数据。在消息类中，提供了低消耗和高消耗两种内容存放方案：<br>    &emsp;&emsp;1）.低消耗方案使用arg1 + arg2 + obj三个字段来存放数据：其中arg1与arg2是int类型，obj是Object类型。虽然能够存放的数据较少，但同时消耗的资源也更少。适合大多数不需要携带具体数据只更改状态的场景。<br>    &emsp;&emsp;2）.高消耗方案使用data字段存放数据：其中data字段为Bundle类型。Bundle对象允许我们写入任意的数据，但仍不建议使用Message传递过多数据。当线程需要传递大量数据时，建议将数据存放在共享区域中。</p>
 <hr>
+<a id="more"></a>
 <h2 id="2-通信内容标识-–-what字段"><a href="#2-通信内容标识-–-what字段" class="headerlink" title="2.通信内容标识 – what字段"></a><strong>2.通信内容标识</strong> <font size="4">– what字段</font></h2><p>&emsp;&emsp;在线程间通信的过程中，我们不仅仅需要传递数据，还需要告诉接收数据的线程此次传递的数据是什么。消息类为我们提供了int类型的what字段，通过将自定义的内容标识保存在what字段中，便可以说明此次传递的数据内容。</p>
 <hr>
 <h2 id="3-何时处理-–-when字段"><a href="#3-何时处理-–-when字段" class="headerlink" title="3.何时处理 – when字段"></a><strong>3.何时处理</strong> <font size="4">– when字段</font></h2><p>&emsp;&emsp;when字段记录消息对象<i> 希望 </i>被处理的时刻。<br>&emsp;&emsp;这个时刻不是用日常生活中的时间表示，为了节省存储，Android用系统从启动直到指定时刻的毫秒数来表示（系统处于深度睡眠状态时不会记录时间）。举个粟子，如果when等于123456，就说明当前消息<i> 希望 </i>在Android系统从启动开始算起的第123456毫秒被执行。这个123456毫秒可能是日常生活中的123456毫秒，也可能是日常生活中的123459毫秒，这取悦于系统深度睡眠时长（在粟子中的睡眠时长是3毫秒）。<br>&emsp;&emsp;当Handler对象post（发布）一条消息时，可以1）设置具体的when值；2）设置相对于post（发布）时刻的延迟时间；3）如果两者都没设置，那么when等于当前时刻。<br>&emsp;&emsp;特别注意，消息被处理的时刻并不一定等于when值指定的时刻。线程阻塞、执行耗时任务、设置SyncBarrier等场景都会影响最终处理时间。</p>
@@ -350,10 +351,10 @@
 <hr>
 <h2 id="5-消息的创建与消息缓存池"><a href="#5-消息的创建与消息缓存池" class="headerlink" title="5.消息的创建与消息缓存池"></a><strong>5.消息的创建与消息缓存池</strong></h2><p>&emsp;&emsp;在创建一个对象时，比较普遍的方法都是直接使用new关键词。但是相对于创建频率比较高的类对象，反复创建并且在使用后留下一大堆对象等待GC回收是一种很消耗资源的方式。既然创建频率比较高，与其让使用完的对象都等待GC回收，不如直接把它们的内容清空后放在一起，当应用需要创建时直接从其中取出一个对象。这样既避免了反复创建，也减轻了GC的回收压力。<br>&emsp;&esmp;Message就采用了这种方式，我们把整个废弃消息集合叫做消息缓存池。消息缓存池设计上很简单但是很巧妙：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">/**指向下一个消息（在消息池时才使用，其他情况下为null）**/</span><br><span class="line">Message next;</span><br><span class="line"></span><br><span class="line">/**消息缓存池出池入池时，施加的同步对象锁**/</span><br><span class="line">private static final Object sPoolSync = new Object();</span><br><span class="line">/**消息缓存池首部的消息，初始默认值为null*/</span><br><span class="line">private static Message sPool;</span><br><span class="line">private static int sPoolSize = 0;</span><br><span class="line">private static final int MAX_POOL_SIZE = 50;</span><br></pre></td></tr></table></figure>
-<p>&emsp;&emsp;注意涉及到缓存池的成员变量只有一个消息类型的next字段，其他包括队首sPool，当前缓存量sPoolSize以及缓存用的虚拟同步对象锁sPoolSync等字段都是静态的final变量。这样的设计极大地减少了消息对象需要占用的资源。<br>&emsp;&emsp;我们可以使用Message.obtain()（或者Handler.obtainMessage()）系列方法搭配需要的提前指定参数从消息缓存池获得一个空闲消息，使用Message.recycle() 回收处在<b> 未使用 </b>状态的消息。凡是涉及到更改消息缓存池的操作都使用synchronized关键字（<a href="http://blog.csdn.net/tear2210/article/details/49451947" target="_blank" rel="external">查看使用方法</a>）施加了同步锁，所以我们不需要考虑同步问题。</p>
+<p>&emsp;&emsp;注意涉及到缓存池的成员变量只有一个消息类型的next字段，其他包括队首sPool，当前缓存量sPoolSize以及缓存用的虚拟同步对象锁sPoolSync等字段都是静态的final变量。这样的设计极大地减少了消息对象需要占用的资源。<br>&emsp;&emsp;我们可以使用Message.obtain()（或者Handler.obtainMessage()）系列方法搭配需要的提前指定参数从消息缓存池获得一个空闲消息，使用Message.recycle() 回收处在<b> 未使用 </b>状态的消息。凡是涉及到更改消息缓存池的操作都使用synchronized关键字（<a href="/2015-10-28/synchronized-01/">查看使用方法</a>）施加了同步锁，所以我们不需要考虑同步问题。</p>
 <hr>
 <h2 id="6-isInUse-与-isAsynchronous-–-flags字段"><a href="#6-isInUse-与-isAsynchronous-–-flags字段" class="headerlink" title="6.isInUse 与 isAsynchronous – flags字段"></a><strong>6.isInUse 与 isAsynchronous</strong> <font size="4">– flags字段</font></h2><p>&emsp;&emsp;Message有两类状态，第一种状态表明消息当前是否正在使用中(isInUse)，第二种状态表明消息是异步消息还是同步消息。两类状态使用int型的flags字段表现，flags最低位标记是否正在使用（0-否 | 1-是），次低位标记是否是异步消息（0-否 | 1-是）。<br>&emsp;&emsp;一个消息的使用状态变化通常是这样的：首先使用Message.obtain()获取一个空闲的消息，在消息缓存池没有消息时返回直接创建的消息，在消息缓存池有消息时则会取出一个消息将其状态从“使用中”更改成“未使用”并返回。Handler拿到消息之后，填入各项内容并使用sendMessage/post方法将消息加入消息队列中，此时消息的状态会变为“使用中”。消息在消息队列中等待处理并且在处理后通过Message.recycleUnchecked()方法回收，这个回收方法在回收时不会判断消息是否在使用中。回收完成后，消息内容被重置、状态变成“使用中”，并且从消息队列中移除进入了消息缓存池中。<br>&emsp;&emsp;当Message处于<i> 使用中 </i>时，将其加入MessageQueue会被抛出IllegalStateException 异常a，（API&gt;=21时）调用它的recycle()方法会因为拒绝回收而抛出IllegalStateException 异常b：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IllegalStateException a:This message is already in use.</span><br><span class="line">IllegalStateException b:This message cannot be recycled because it is still in use.</span><br></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;同步消息和异步消息的区别主要是两点。第一点，同步消息自始至终都会按照顺序执行（如果when相同的Message，哪个先入队就先执行哪个），异步消息的执行顺序则完全不确定。第二点，同步消息会同步障碍器拦截而异步消息不会受到影响（详见<a href="http://blog.csdn.net/tear2210/article/details/49788369#t2" target="_blank" rel="external">Android线程间通信（二）：MessageQueue</a>）。<br>&emsp;&emsp;</p>
+<p>&emsp;&emsp;同步消息和异步消息的区别主要是两点。第一点，同步消息自始至终都会按照顺序执行（如果when相同的Message，哪个先入队就先执行哪个），异步消息的执行顺序则完全不确定。第二点，同步消息会同步障碍器拦截而异步消息不会受到影响（详见<a href="/2015-11-18/handler-02-MessageQueue/">Android线程间通信（二）：MessageQueue</a>）。<br>&emsp;&emsp;</p>
 <p>Message.markInUse()：将当前Message设置为使用中；<br>Message.isInUse()：判断当前Message是否正在使用中；<br>Message.isAsynchronous()：判断当前Message是否是异步消息；<br>Message.setAsynchronous(boolean)：设置当前Message是否是异步消息。</p>
 <hr>
 <h2 id="7-消息的回收-–-recycle-与recycleUnchecked"><a href="#7-消息的回收-–-recycle-与recycleUnchecked" class="headerlink" title="7.消息的回收 – recycle()与recycleUnchecked()"></a><strong>7.消息的回收</strong><font size="4"> – recycle()与recycleUnchecked()</font></h2><p>&emsp;&emsp;一般情况下并不需要我们手动回收消息，在Looper类处理完消息之后会自动释放消息（不检查状态）。如果您真的需要回收消息，应该先确保消息没有处在”使用中“，然后通过调用recycle()方法在非android.os包下回收消息。recycleUnchecked()方法只能在同一个类包下使用：</p>
@@ -388,16 +389,16 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015-10-28/synchronized-03/" rel="next" title="场景二：synchronized修饰方法">
-                <i class="fa fa-chevron-left"></i> 场景二：synchronized修饰方法
+              <a href="/2015-11-17/handler-00-overview/" rel="next" title="Android线程间通信（总）">
+                <i class="fa fa-chevron-left"></i> Android线程间通信（总）
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016-05-15/hello-world/" rel="prev" title="Hello Worldxxxxx">
-                Hello Worldxxxxx <i class="fa fa-chevron-right"></i>
+              <a href="/2015-11-18/handler-02-MessageQueue/" rel="prev" title="Android线程间通信（二）：MessageQueue">
+                Android线程间通信（二）：MessageQueue <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -466,7 +467,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-count">9</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -474,7 +475,7 @@
           
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>

@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Android源码分析," />
 
 
 
@@ -86,13 +86,13 @@
 
 <meta name="description" content="&amp;emsp;&amp;emsp;Looper类负责循环地从消息队列取消息，并通过消息中的Handler或者Runnable对象完成消息的处理。Looper对象和线程对象是一一对应的，一个线程只能拥有至多（可以没有）一个Looper对象，一个Looper有且只属于一个线程。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="匠心奉孝">
-<meta property="og:url" content="http://yoursite.com/2016-05-15/Android线程间通信（三）：Looper/index.html">
+<meta property="og:title" content="Android线程间通信（三）：Looper">
+<meta property="og:url" content="http://yoursite.com/2015-11-20/handler-03-Looper/index.html">
 <meta property="og:site_name" content="匠心奉孝">
 <meta property="og:description" content="&amp;emsp;&amp;emsp;Looper类负责循环地从消息队列取消息，并通过消息中的Handler或者Runnable对象完成消息的处理。Looper对象和线程对象是一一对应的，一个线程只能拥有至多（可以没有）一个Looper对象，一个Looper有且只属于一个线程。">
-<meta property="og:updated_time" content="2016-05-15T13:54:39.156Z">
+<meta property="og:updated_time" content="2016-05-22T05:20:25.485Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="匠心奉孝">
+<meta name="twitter:title" content="Android线程间通信（三）：Looper">
 <meta name="twitter:description" content="&amp;emsp;&amp;emsp;Looper类负责循环地从消息队列取消息，并通过消息中的Handler或者Runnable对象完成消息的处理。Looper对象和线程对象是一一对应的，一个线程只能拥有至多（可以没有）一个Looper对象，一个Looper有且只属于一个线程。">
 
 
@@ -111,7 +111,7 @@
   };
 </script>
 
-  <title>  | 匠心奉孝 </title>
+  <title> Android线程间通信（三）：Looper | 匠心奉孝 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -261,7 +261,7 @@
             
             
               
-                
+                Android线程间通信（三）：Looper
               
             
           </h1>
@@ -273,11 +273,42 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-05-15T19:47:24+08:00" content="2016-05-15">
-              2016-05-15
+            <time itemprop="dateCreated" datetime="2015-11-20T11:14:00+08:00" content="2015-11-20">
+              2015-11-20
             </time>
           </span>
 
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/源码分析/" itemprop="url" rel="index">
+                    <span itemprop="name">源码分析</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
           
 
           
@@ -302,7 +333,9 @@
 
       
         <p>&emsp;&emsp;Looper类负责循环地从消息队列取消息，并通过消息中的Handler或者Runnable对象完成消息的处理。Looper对象和线程对象是一一对应的，一个线程只能拥有至多（可以没有）一个Looper对象，一个Looper有且只属于一个线程。</p>
-<h2 id=""><a href="#" class="headerlink" title=""></a><a id="more"></a></h2><h2 id="1-ThreadLocal类"><a href="#1-ThreadLocal类" class="headerlink" title="1.ThreadLocal类"></a><strong>1.ThreadLocal类</strong></h2><p>&emsp;&emsp;在介绍Looper类之前，我们先简单介绍一下ThreadLocal类。ThreadLocal类更加确切地名称应该是ThreadLocalVariable（线程局部变量）。<br>&emsp;&emsp;假设有一个类A对象a，a中含有int型的成员变量b。当我们用不同的线程在同一个时刻去访问a对象的b值，返回的值都是一样的。当我们用任意一个线程去改变a对象的b值后，其他线程再去读取这个b的值也都是更改后的b值。这样的场景，其实就相当于所有线程共同拥有这个a对象的b值，而不是某一个线程独占它。<br>&emsp;&emsp;如果我们用ThreadLocal去修饰这个成员变量b（ThreadLocal&lt;Integer&gt; b），每个线程在访问a对象的b变量时，就都会得到一个专属于自己的值（支持null）。这就是ThreadLocal类唯一的作用 —— 在线程的范畴内局部化变量。ThreadLocal类的原理基本都类似于使用一个”Thread-变量”的map保存所修饰的变量，在这个例子中ThreadLocal中其实就相当于含有一个Map&lt;Thread，Integer&gt;类型的map成员。具体实现根据JDK版本的不同会有所不同，有用Object数组实现的，有用Map实现的，也有用其他奇淫技巧实现的。<br>&emsp;&emsp;这也就不难理解为什么通过ThreadLocal修饰就能使得多个线程访问同一个对象的成员能够得到专属于自己的值。类似的，一个线程去更改自己专属的变量值，也不会影响到其他任何线程。这就是使得本是所有线程公有的一个成员变量，变成了多个专属于各个线程的成员变量。</p>
+<hr>
+<a id="more"></a>
+<h2 id="1-ThreadLocal类"><a href="#1-ThreadLocal类" class="headerlink" title="1.ThreadLocal类"></a><strong>1.ThreadLocal类</strong></h2><p>&emsp;&emsp;在介绍Looper类之前，我们先简单介绍一下ThreadLocal类。ThreadLocal类更加确切地名称应该是ThreadLocalVariable（线程局部变量）。<br>&emsp;&emsp;假设有一个类A对象a，a中含有int型的成员变量b。当我们用不同的线程在同一个时刻去访问a对象的b值，返回的值都是一样的。当我们用任意一个线程去改变a对象的b值后，其他线程再去读取这个b的值也都是更改后的b值。这样的场景，其实就相当于所有线程共同拥有这个a对象的b值，而不是某一个线程独占它。<br>&emsp;&emsp;如果我们用ThreadLocal去修饰这个成员变量b（ThreadLocal&lt;Integer&gt; b），每个线程在访问a对象的b变量时，就都会得到一个专属于自己的值（支持null）。这就是ThreadLocal类唯一的作用 —— 在线程的范畴内局部化变量。ThreadLocal类的原理基本都类似于使用一个”Thread-变量”的map保存所修饰的变量，在这个例子中ThreadLocal中其实就相当于含有一个Map&lt;Thread，Integer&gt;类型的map成员。具体实现根据JDK版本的不同会有所不同，有用Object数组实现的，有用Map实现的，也有用其他奇淫技巧实现的。<br>&emsp;&emsp;这也就不难理解为什么通过ThreadLocal修饰就能使得多个线程访问同一个对象的成员能够得到专属于自己的值。类似的，一个线程去更改自己专属的变量值，也不会影响到其他任何线程。这就是使得本是所有线程公有的一个成员变量，变成了多个专属于各个线程的成员变量。</p>
 <p>&emsp;&emsp;因为在任意线程中调用Thread.currentThread()方法都能直接得到当前的线程对象，所以ThreadLocal对外的几个方法都没有带入Thread参数：<br>&emsp;&emsp;ThreadLocal.get()：得到当前对象对应的局部变量；<br>&emsp;&emsp;ThreadLocal.set(T)：设置当前对象对应的局部变量；<br>&emsp;&emsp;ThreadLocal.remove()：移除当前对象对应的局部变量。<br>&emsp;&emsp;关于ThreadLocal，有一个作死的做法。我们来看看给两个线程设置同一个对象作为线程局部变量时会发生什么：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">public class VerifyThreadLocal &#123;</span><br><span class="line">	private static int times = 0;</span><br><span class="line">	public ThreadLocal&lt;SimpleItem&gt; ItemTL =new ThreadLocal&lt;SimpleItem&gt;();</span><br><span class="line">	</span><br><span class="line">	 public static void main(String arg[])&#123;</span><br><span class="line">		 final VerifyThreadLocal vtl = new VerifyThreadLocal();</span><br><span class="line">		 final SimpleItem si = vtl.new SimpleItem(&quot;Original text&quot;);</span><br><span class="line">		 new Thread()&#123;</span><br><span class="line">			public void run() &#123;</span><br><span class="line">				vtl.ItemTL.set(si);</span><br><span class="line">				times ++;</span><br><span class="line">				</span><br><span class="line">				while(times !=2)&#123;</span><br><span class="line">					Thread.yield();</span><br><span class="line">				&#125;</span><br><span class="line">				System.out.println(&quot;Thread-1 before ： &quot;+vtl.ItemTL.get().content);</span><br><span class="line">				vtl.ItemTL.get().content = &quot;Alter text&quot;;</span><br><span class="line">				System.out.println(&quot;Thread-1 after ： &quot;+vtl.ItemTL.get().content);</span><br><span class="line">				System.out.println(&quot;Thread-1 Object ： &quot;+vtl.ItemTL.get());</span><br><span class="line">				times++;</span><br><span class="line">			&#125; </span><br><span class="line">		 &#125;.start();</span><br><span class="line">		 </span><br><span class="line">		 new Thread()&#123;</span><br><span class="line">			 public void run() &#123;</span><br><span class="line">				 vtl.ItemTL.set(si);</span><br><span class="line">				 times ++;</span><br><span class="line">					</span><br><span class="line">				 while(times !=3)&#123;</span><br><span class="line">					 Thread.yield();</span><br><span class="line">				 &#125;</span><br><span class="line">				 System.out.println(&quot;Thread-2 ： &quot;+vtl.ItemTL.get().content);</span><br><span class="line">				 System.out.println(&quot;Thread-2 Object ： &quot;+vtl.ItemTL.get());</span><br><span class="line">			 &#125;;</span><br><span class="line">		 &#125;.start();</span><br><span class="line">	 &#125;</span><br><span class="line">	 </span><br><span class="line">	 class SimpleItem &#123;</span><br><span class="line">			public String content;</span><br><span class="line">			</span><br><span class="line">			public SimpleItem(String content) &#123;</span><br><span class="line">				this.content = content;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>&emsp;&emsp;当我们在线程1更改其对应的线程局部对象的content值后，线程2取出的值会受影响吗？且看输出：</p>
@@ -354,18 +387,28 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/Android源码分析/" rel="tag">#Android源码分析</a>
+          
+        </div>
+      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016-05-15/Android线程间通信（补充）：UI线程/" rel="next" title="">
-                <i class="fa fa-chevron-left"></i> 
+              <a href="/2015-11-18/handler-02-MessageQueue/" rel="next" title="Android线程间通信（二）：MessageQueue">
+                <i class="fa fa-chevron-left"></i> Android线程间通信（二）：MessageQueue
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015-11-20/handler-04-Handler/" rel="prev" title="Android线程间通信（四）：Handler">
+                Android线程间通信（四）：Handler <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -433,7 +476,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-count">9</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -441,7 +484,7 @@
           
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -479,7 +522,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-ThreadLocal类"><span class="nav-number">2.</span> <span class="nav-text">1.ThreadLocal类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Looper-prepare"><span class="nav-number">3.</span> <span class="nav-text">2.Looper.prepare()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-loop"><span class="nav-number">4.</span> <span class="nav-text">3.loop()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-quit-和quitSafely"><span class="nav-number">5.</span> <span class="nav-text">4.quit()和quitSafely()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Looper类使用示例"><span class="nav-number">6.</span> <span class="nav-text">5.Looper类使用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-主线程Looper"><span class="nav-number">7.</span> <span class="nav-text">6.主线程Looper</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-ThreadLocal类"><span class="nav-number">1.</span> <span class="nav-text">1.ThreadLocal类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Looper-prepare"><span class="nav-number">2.</span> <span class="nav-text">2.Looper.prepare()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-loop"><span class="nav-number">3.</span> <span class="nav-text">3.loop()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-quit-和quitSafely"><span class="nav-number">4.</span> <span class="nav-text">4.quit()和quitSafely()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Looper类使用示例"><span class="nav-number">5.</span> <span class="nav-text">5.Looper类使用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-主线程Looper"><span class="nav-number">6.</span> <span class="nav-text">6.主线程Looper</span></a></li></ol></div>
             
           </div>
         </section>

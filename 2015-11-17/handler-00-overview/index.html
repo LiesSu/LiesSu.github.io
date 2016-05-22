@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Android源码分析," />
 
 
 
@@ -88,16 +88,16 @@
 
 E/AndroidRuntime(4507):android.view.ViewRootImpl$CalledFromWro">
 <meta property="og:type" content="article">
-<meta property="og:title" content="匠心奉孝">
-<meta property="og:url" content="http://yoursite.com/2016-05-15/Android线程间通信（总）/index.html">
+<meta property="og:title" content="Android线程间通信（总）">
+<meta property="og:url" content="http://yoursite.com/2015-11-17/handler-00-overview/index.html">
 <meta property="og:site_name" content="匠心奉孝">
 <meta property="og:description" content="&amp;emsp;&amp;emsp;当执行诸如加载列表、Http请求、Socket数据包解析等任务时，通常都需要我们另外开启线程执行。这时如果任务中出现需要更新应用界面的操作时，我们是不能直接更新的。 与Java不同，Android中只允许在UI/主线程更新应用界面。否则会抛出异常：
 
 E/AndroidRuntime(4507):android.view.ViewRootImpl$CalledFromWro">
 <meta property="og:image" content="http://img.blog.csdn.net/20151119144131508">
-<meta property="og:updated_time" content="2016-05-15T13:49:27.000Z">
+<meta property="og:updated_time" content="2016-05-22T05:43:08.654Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="匠心奉孝">
+<meta name="twitter:title" content="Android线程间通信（总）">
 <meta name="twitter:description" content="&amp;emsp;&amp;emsp;当执行诸如加载列表、Http请求、Socket数据包解析等任务时，通常都需要我们另外开启线程执行。这时如果任务中出现需要更新应用界面的操作时，我们是不能直接更新的。 与Java不同，Android中只允许在UI/主线程更新应用界面。否则会抛出异常：
 
 E/AndroidRuntime(4507):android.view.ViewRootImpl$CalledFromWro">
@@ -119,7 +119,7 @@ E/AndroidRuntime(4507):android.view.ViewRootImpl$CalledFromWro">
   };
 </script>
 
-  <title>  | 匠心奉孝 </title>
+  <title> Android线程间通信（总） | 匠心奉孝 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -269,7 +269,7 @@ E/AndroidRuntime(4507):android.view.ViewRootImpl$CalledFromWro">
             
             
               
-                
+                Android线程间通信（总）
               
             
           </h1>
@@ -281,11 +281,42 @@ E/AndroidRuntime(4507):android.view.ViewRootImpl$CalledFromWro">
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-05-15T19:47:24+08:00" content="2016-05-15">
-              2016-05-15
+            <time itemprop="dateCreated" datetime="2015-11-17T18:12:00+08:00" content="2015-11-17">
+              2015-11-17
             </time>
           </span>
 
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/源码分析/" itemprop="url" rel="index">
+                    <span itemprop="name">源码分析</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
           
 
           
@@ -315,10 +346,11 @@ E/AndroidRuntime(4507):android.view.ViewRootImpl$CalledFromWro">
 </blockquote>
 <p>&emsp;&emsp;所以，这时我们不得不将更新界面的操作发往UI线程并由UI线程实现界面的更新。这是实际开发中用到最多的线程间通信场景，目前使用较为广泛的线程间通信方案有两种，一种是由Android提供的Thread + Handler方案，另一种方案是使用第三方库EventBus。相对于Thread + Handler，EventBus只能在Android组件中（Activity、service、ContentProvider等）间使用，所以局限性较大。有兴趣的朋友请参考EventBus官网：<a href="http://www.eventbus.org/。" target="_blank" rel="external">http://www.eventbus.org/。</a><br>&emsp;&emsp;Thread + Handler式的线程间通信，涉及到Message、MessageQueue、Looper、Handler四个主要类，以及ThreadLocal类、synchronized关键词等关联内容。</p>
 <hr>
-<h2 id="一、通信基础类"><a href="#一、通信基础类" class="headerlink" title="一、通信基础类"></a><strong>一、通信基础类</strong></h2><p><strong>a.Message类</strong><br> &emsp;&emsp;Message（消息）类是通信内容的载体。线程间的通信包含哪些数据、是什么目的、是异步还是同步、要求什么时候执行其中封装的操作等等信息，都由消息保存。消息类设置有消息缓存池，推荐取消息时从缓存池中取。<br>&emsp;&emsp;<a href="http://blog.csdn.net/tear2210/article/details/49741647" target="_blank" rel="external">Android线程间通信（一）：Message</a></p>
-<p><strong>b.MessageQueue类</strong><br>&emsp;&emsp;MessageQueue（消息队列）是Message（消息）的管理者，它负责保存消息的集合，执行消息入队、出队等操作，同时提供SyncBarrier（同步障碍器）与IdleHandler（闲时任务）机制。SyncBarrier机制允许暂停部分Message的出队，而IdleHandler机制允许在没有消息需要出队处理时执行一些简单的任务。<br>&emsp;&emsp;<a href="http://blog.csdn.net/tear2210/article/details/49788369" target="_blank" rel="external">Android线程间通信（二）：MessageQueue（上）</a><br>&emsp;&emsp;<a href="http://blog.csdn.net/tear2210/article/details/49815181" target="_blank" rel="external">Android线程间通信（二）：MessageQueue（中）</a><br>&emsp;&emsp;Android线程间通信（二）：MessageQueue（下）（待更）</p>
-<p><strong>c.Looper类</strong><br>&emsp;&emsp;Looper类负责循环地从消息队列取消息，并通过消息中的Handler或者Runnable对象完成消息的处理。Looper对象和线程对象是一一对应的，一个线程只能拥有至多（可以没有）一个Looper对象，一个Looper有且只属于一个线程。<br>&emsp;&emsp;<a href="http://blog.csdn.net/tear2210/article/details/49848995" target="_blank" rel="external">Android线程间通信（三）：Looper </a></p>
-<p><strong>d.Handler类</strong><br>&emsp;&emsp;在Android整个线程间通信的结构中，Message是通信内容的载体，MessageQueue是Message的管理者，Looper负责从MessageQueue中循环地取消息并分发给对应Handler处理，而Handler是Message的发布者兼处理者。<br>&emsp;&emsp;Handler是实现线程间通信的关键，任何从其他线程发往本线程的消息都要通过Handler发送。Handler在创建时会默认绑定本线程的Looper，这是Handler发出的消息能够被本线程接收的关键。<br>&emsp;&emsp;<a href="http://blog.csdn.net/tear2210/article/details/49883583" target="_blank" rel="external">Android线程间通信（四）：Handler </a></p>
+<a id="more"></a>   
+<h2 id="一、通信基础类"><a href="#一、通信基础类" class="headerlink" title="一、通信基础类"></a><strong>一、通信基础类</strong></h2><p><strong>a.Message类</strong><br> &emsp;&emsp;Message（消息）类是通信内容的载体。线程间的通信包含哪些数据、是什么目的、是异步还是同步、要求什么时候执行其中封装的操作等等信息，都由消息保存。消息类设置有消息缓存池，推荐取消息时从缓存池中取。<br>&emsp;&emsp;<a href="/2015-11-18/handler-01-Message/">Android线程间通信（一）：Message</a></p>
+<p><strong>b.MessageQueue类</strong><br>&emsp;&emsp;MessageQueue（消息队列）是Message（消息）的管理者，它负责保存消息的集合，执行消息入队、出队等操作，同时提供SyncBarrier（同步障碍器）与IdleHandler（闲时任务）机制。SyncBarrier机制允许暂停部分Message的出队，而IdleHandler机制允许在没有消息需要出队处理时执行一些简单的任务。<br>&emsp;&emsp;<a href="/2015-11-18/handler-02-MessageQueue/">Android线程间通信（二）：MessageQueue（上）</a><br>&emsp;&emsp;<a href="/2015-11-18/handler-02-MessageQueue/">Android线程间通信（二）：MessageQueue（中）</a><br>&emsp;&emsp;Android线程间通信（二）：MessageQueue（下）（待更）</p>
+<p><strong>c.Looper类</strong><br>&emsp;&emsp;Looper类负责循环地从消息队列取消息，并通过消息中的Handler或者Runnable对象完成消息的处理。Looper对象和线程对象是一一对应的，一个线程只能拥有至多（可以没有）一个Looper对象，一个Looper有且只属于一个线程。<br>&emsp;&emsp;<a href="/2015-11-20/handler-03-Looper/">Android线程间通信（三）：Looper </a></p>
+<p><strong>d.Handler类</strong><br>&emsp;&emsp;在Android整个线程间通信的结构中，Message是通信内容的载体，MessageQueue是Message的管理者，Looper负责从MessageQueue中循环地取消息并分发给对应Handler处理，而Handler是Message的发布者兼处理者。<br>&emsp;&emsp;Handler是实现线程间通信的关键，任何从其他线程发往本线程的消息都要通过Handler发送。Handler在创建时会默认绑定本线程的Looper，这是Handler发出的消息能够被本线程接收的关键。<br>&emsp;&emsp;<a href="/2015-11-20/handler-04-Handler/">Android线程间通信（四）：Handler </a></p>
 <hr>
 <h2 id="二、通信流程简介"><a href="#二、通信流程简介" class="headerlink" title="二、通信流程简介"></a><strong>二、通信流程简介</strong></h2><p>&emsp;&emsp;我们撇开细节捋一捋整个通信的流程。在线程a和线程b之间通信：<br>&emsp;&emsp;1）在线程b创建Handler对象并保证在线程a中能够获取整个对象；<br>&emsp;&emsp;2）线程a获取b创建Handler对象，并通过它将需要通信的内容发往线程b；<br>&emsp;&emsp;3）Handler发出的内容以消息的形式进入线程b的消息队列中等待处理；<br>&emsp;&emsp;4）线程b是接收方，所以需要为其申请Looper对象。并在run()中执行对应Looper的loop()；<br>&emsp;&emsp;5）loop()从对应消息队列中取消息，取出后交给发出该消息的Handler对象分发；<br>&emsp;&emsp;6）Handler对象根据消息类型分发消息，指定处理消息的处理程序（Handler本身或者Runnable实现类）。</p>
 <p>&emsp;&emsp;<img src="http://img.blog.csdn.net/20151119144131508" alt="消息在整个通信中的大致流程"></p>
@@ -332,12 +364,12 @@ E/AndroidRuntime(4507):android.view.ViewRootImpl$CalledFromWro">
 <p>&emsp;&emsp;我们可以看到，在创建Handler时会把当前线程（即receiver线程）的Looper保存在Handler对象中。</p>
 <p><strong>3.开启消息队列的循环处理</strong><br>&emsp;&emsp;在第一步创建Looper时，Looper的消息队列也会随之创建。接下来，在其他线程发送消息过来之前我们需要让receive线程开始循环处理消息队列，即调用Looper.loop()。推荐这样做，但在这步之前发送消息也不会妨碍消息进入消息队列，只可能会影响消息的处理时间。<br>&emsp;&emsp;<strong>Looper.loop()会调用消息队列的next()方法取消息。因为此时消息队列中并没有消息，消息队列选择阻塞接收线程，等到可以取出消息再唤醒线程并将消息返回给Looper.loop()。</strong></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">Message next() &#123;</span><br><span class="line">     final long ptr = mPtr;</span><br><span class="line">     ……（代码略。如果消息循环正在退出或者已经废弃，直接返回null。）</span><br><span class="line"></span><br><span class="line">     int nextPollTimeoutMillis = 0;  //阻塞时长</span><br><span class="line">     for (;;) &#123;</span><br><span class="line">        ……（不相关内容）</span><br><span class="line">        //nextPollTimeoutMillis为0立即返回，为-1则无限等待(必须主动唤醒)。ptr是指针，涉及本地方法不深究。</span><br><span class="line">        nativePollOnce(ptr, nextPollTimeoutMillis);</span><br><span class="line">        synchronized (this) &#123;</span><br><span class="line">           //now等于自系统启动以来到此时此刻的非深度睡眠时长</span><br><span class="line">           final long now = SystemClock.uptimeMillis();</span><br><span class="line">           Message prevMsg = null;</span><br><span class="line">           Message msg = mMessages; //队首消息</span><br><span class="line"></span><br><span class="line">           //如果当前队首的消息时设置的同步障碍器（target为null）。</span><br><span class="line">           if (msg != null &amp;&amp; msg.target == null) &#123;</span><br><span class="line">               // 因为同步障碍器的原因而进入该分支，找到下一个异步消息之后才会结束while。</span><br><span class="line">               do &#123;</span><br><span class="line">                    prevMsg = msg;</span><br><span class="line">                    msg = msg.next;</span><br><span class="line">               &#125; while (msg != null &amp;&amp; !msg.isAsynchronous());</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            //此时msg一定是普通消息或者null，一定不是同步障碍器</span><br><span class="line">            if (msg != null) &#123; </span><br><span class="line">                    if (now &lt; msg.when) &#123;</span><br><span class="line">                        //队首第一个非障碍器的消息执行时间未到，计算阻塞时长</span><br><span class="line">                        nextPollTimeoutMillis = (int) Math.min(msg.when - now, Integer.MAX_VALUE);</span><br><span class="line">                    &#125; else &#123;//一切正常，开始取消息</span><br><span class="line">                        mBlocked = false;//不阻塞线程</span><br><span class="line">                        if (prevMsg != null) &#123;//如果跳过了队首的同步障碍器取异步消息</span><br><span class="line">                            prevMsg.next = msg.next;</span><br><span class="line">                        &#125; else &#123;//如果当前消息就是队首消息</span><br><span class="line">                            mMessages = msg.next;</span><br><span class="line">                        &#125;</span><br><span class="line">                        msg.next = null;</span><br><span class="line">                        if (false) Log.v(&quot;MessageQueue&quot;, &quot;Returning message: &quot; + msg);</span><br><span class="line">                        return msg;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; else &#123; //消息队列为空，或者队首是SyncBarrier且队列中无异步消息</span><br><span class="line">                    nextPollTimeoutMillis = -1;//-1表示无限等待  ————》本例会永久阻塞线程，直到被唤醒</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">               //所有待处理的消息均处理完成， 接下来处理闲时任务</span><br><span class="line">               ……（因为当前代码块在无限for循环中，此时再次验证一下消息队列是否正在退出。如果是，则废弃消息队列并返回null。）</span><br><span class="line"></span><br><span class="line">               ……（初始化闲时任务）</span><br><span class="line">               //闲时任务列表为空，或者不是第一次执行到这里</span><br><span class="line">               if (pendingIdleHandlerCount &lt;= 0) &#123;</span><br><span class="line">                   mBlocked = true;</span><br><span class="line">                   continue; </span><br><span class="line">               &#125;</span><br><span class="line">               ……（初始化闲时任务）</span><br><span class="line">            &#125;//synchronized结束</span><br><span class="line"></span><br><span class="line">            ……（如果是本次调用next()过程中第一次到达这里，则执行闲时任务。如果不是第一次，则不会执行到这里）</span><br><span class="line">            //将待处理的IdleHandler个数设置为0，使得本次next()的调用再也不会到达这个for循环。</span><br><span class="line">            pendingIdleHandlerCount = 0;</span><br><span class="line"></span><br><span class="line">            //因为执行了闲时任务花费了一段时间（迭代开始处的阻塞方法还未执行到所以还未阻塞），此时再根据之前</span><br><span class="line">            //计算出的阻塞时长阻塞线程显然不合适。</span><br><span class="line">            nextPollTimeoutMillis = 0;</span><br><span class="line">        &#125;//for(;;)结束</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p><strong>4.发送消息</strong><br>&emsp;&emsp;到这一步，接收线程已经作好了接收通信内容的准备。可以开始往其中发送消息，在示例中的发送线程中我们使用了众多发送方法中最简单的一种，其他相关方法可参考姊妹篇<a href="http://blog.csdn.net/tear2210/article/details/49883583" target="_blank" rel="external">Handler详解</a>。</p>
+<p><strong>4.发送消息</strong><br>&emsp;&emsp;到这一步，接收线程已经作好了接收通信内容的准备。可以开始往其中发送消息，在示例中的发送线程中我们使用了众多发送方法中最简单的一种，其他相关方法可参考姊妹篇<a href="/2015-11-20/handler-04-Handler/">Handler详解</a>。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">public final boolean sendEmptyMessage(int what)</span><br><span class="line">&#123;</span><br><span class="line">   return sendEmptyMessageDelayed(what, 0);</span><br><span class="line">&#125;</span><br><span class="line">public final boolean sendEmptyMessageDelayed(int what, long delayMillis) &#123;</span><br><span class="line">   Message msg = Message.obtain();</span><br><span class="line">   msg.what = what;</span><br><span class="line">   return sendMessageDelayed(msg, delayMillis);</span><br><span class="line">&#125;</span><br><span class="line">public final boolean sendMessageDelayed(Message msg, long delayMillis)</span><br><span class="line">&#123;</span><br><span class="line">   if (delayMillis &lt; 0) &#123;</span><br><span class="line">       delayMillis = 0;</span><br><span class="line">   &#125;</span><br><span class="line">   //SystemClock.uptimeMillis()得到系统正常运行的时间，线程通信模块均使用系统正常运行时间来表示时间</span><br><span class="line">   return sendMessageAtTime(msg, SystemClock.uptimeMillis() + delayMillis);</span><br><span class="line">&#125;</span><br><span class="line">public boolean sendMessageAtTime(Message msg, long uptimeMillis) &#123;</span><br><span class="line">   MessageQueue queue = mQueue;</span><br><span class="line">   if (queue == null) &#123;</span><br><span class="line">            RuntimeException e = new RuntimeException(</span><br><span class="line">                    this + &quot; sendMessageAtTime() called with no mQueue&quot;);</span><br><span class="line">            Log.w(&quot;Looper&quot;, e.getMessage(), e);</span><br><span class="line">            return false;</span><br><span class="line">   &#125;</span><br><span class="line">   return enqueueMessage(queue, msg, uptimeMillis);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line">  * 将消息msg加入消息队列queue中，uptimeMillis即为消息的执行时间&lt;em&gt; when &lt;/em&gt;。</span><br><span class="line">  */</span><br><span class="line">private boolean enqueueMessage(MessageQueue queue, Message msg, long uptimeMillis) &#123;</span><br><span class="line">    msg.target = this;  //将发送该消息的Handler,也即当前Handler保存在消息中。分派消息时会使用这个字段</span><br><span class="line">    if (mAsynchronous) &#123;</span><br><span class="line">       msg.setAsynchronous(true);</span><br><span class="line">    &#125;</span><br><span class="line">    return queue.enqueueMessage(msg, uptimeMillis);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>&emsp;&emsp;Handler类中用于发送消息的方法很多，但是都是这样一步一步包装消息并且最终调用Handler的私有方法enqueueMessage()来完成消息入队的。因为我们发送的是一个空消息，所以在包装该消息的过程中，已经将当前时刻设定成了该消息希望被处理的时间。到这里，应用开发者已经完成了所有线程间通信需要完成的内容。</p>
 <p><strong>5.将消息加入消息队列</strong><br>&emsp;&emsp;从这一步开始直到消息处理完毕，都有Android系统完成。当Handler包装好消息后，就需要消息队列来接收这一个消息。特别提醒一点，入队消息这个操作依旧是在发送线程完成。</p>
 <p><strong>PS：分析代码时，可滤过主动唤醒的内容。暂时知道在本例中会主动唤醒接收线程即可。</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">boolean enqueueMessage(Message msg, long when) &#123;</span><br><span class="line">    ……（msg的合法性判断，不合法会终止入队）</span><br><span class="line"></span><br><span class="line">    synchronized (this) &#123;</span><br><span class="line">        ……（判断当前消息队列是否正在退出或者已经废弃）</span><br><span class="line">       msg.markInUse();</span><br><span class="line">       msg.when = when;</span><br><span class="line">       Message p = mMessages;</span><br><span class="line">       boolean needWake;</span><br><span class="line">       //如果队列首部为null，或者入队消息需要马上执行，或者入队消息执行时间早于队首消息，且线程已阻塞则都需要唤醒。</span><br><span class="line">       //如果 p!=null&amp;&amp;when!=0&amp;&amp;when&gt;p.when，则不需要唤醒。</span><br><span class="line">       if (p == null || when == 0 || when &lt; p.when) &#123;</span><br><span class="line">           msg.next = p;</span><br><span class="line">           mMessages = msg;</span><br><span class="line">           needWake = mBlocked;//mBlocked记录消息循环是否阻塞</span><br><span class="line">       &#125; else &#123;</span><br><span class="line">           /*在队列中间插入一个消息。一般情况下不需要唤醒队列（不是加到队首为什么要唤醒呢？），除</span><br><span class="line">            * 非队首是一个同步障碍器而且新插入的消息是 1)异步消息 2)执行时间是队列中最早 时。*/</span><br><span class="line"></span><br><span class="line">           //此处mBlocked值需要根据情况决定。当线程已经阻塞且队首消息是同步障碍器是新加入异步消息，needWake</span><br><span class="line">           //才可能(!!)为true。这还要判断消息队列中是否有异步消息，以及异步消息的处理时间早于还是晚于新加入的异步消息。</span><br><span class="line">           needWake = mBlocked &amp;&amp; p.target == null &amp;&amp; msg.isAsynchronous(); //如果是true也是暂时的，还有考验在等着呢！</span><br><span class="line">           //寻找位置</span><br><span class="line">           Message prev;</span><br><span class="line">           for (;;) &#123;</span><br><span class="line">                prev = p;</span><br><span class="line">                p = p.next;</span><br><span class="line">                if (p == null || when &lt; p.when) &#123;</span><br><span class="line">                   break;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                if (needWake &amp;&amp; p.isAsynchronous()) &#123;</span><br><span class="line">                    //能到达这里，说明msg.when &gt; p.when。既然needWake是true，毫无疑问此时消息队列是</span><br><span class="line">                    //处于阻塞的。这只有一种可能，p这个异步消息的执行时间还没到（情况4）！msg的执行时间还</span><br><span class="line">                    //更晚（不更晚早break了），那就没有必要唤醒消息队列了。</span><br><span class="line">                    needWake = false;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;//for结束</span><br><span class="line"></span><br><span class="line">            //插入新消息</span><br><span class="line">            msg.next = p; // invariant: p == prev.next</span><br><span class="line">            prev.next = msg;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       if (needWake) &#123;</span><br><span class="line">           nativeWake(mPtr);//唤醒消息队列</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return true;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;主动唤醒相关内容，详细内容可参考姊妹篇<a href="http://blog.csdn.net/tear2210/article/details/49815181" target="_blank" rel="external">MessageQueue(中)</a>。<br>&emsp;&emsp;我们可以看到，方法是按照消息执行时间(when字段指定)的先后来组合消息的。我们发出的消息找到它应该放置的位置之后就会正式进入消息队列，此时接收线程早已启动循环处理操作，但是因为没有消息处理线程已经被阻塞了，在本示例中会主动唤醒接收线程。</p>
+<p>&emsp;&emsp;主动唤醒相关内容，详细内容可参考姊妹篇<a href="/2015-11-18/handler-02-MessageQueue/">MessageQueue(中)</a>。<br>&emsp;&emsp;我们可以看到，方法是按照消息执行时间(when字段指定)的先后来组合消息的。我们发出的消息找到它应该放置的位置之后就会正式进入消息队列，此时接收线程早已启动循环处理操作，但是因为没有消息处理线程已经被阻塞了，在本示例中会主动唤醒接收线程。</p>
 <p><strong>6.接收线程被唤醒</strong><br>&emsp;&emsp;本例中Handler所发送的消息触发了唤醒接收线程的操作，接收线程成功唤醒后开始继续执行消息队列的next()方法。此时我们发出的消息已经在消息队列中并且处于等待处理的情况，所以next()会返回这个消息然后结束。</p>
 <p><strong>7.消息循环取出一个消息（此时该消息会从消息队列中剔除）</strong><br>&emsp;&emsp;loop()方法其实很简单，它用一个无限循环不断从消息队列中取消息、分派消息并让处理程序处理、回收消息：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">  * 在当前线程中执行消息循环。确保在当前线程中保存有对应的Looper对象lI，并在调用looper()之后于其</span><br><span class="line">  * 他线程中通过lI.quit()/lI.quitSafely()终止loop()的死循环。</span><br><span class="line">  *</span><br><span class="line">  */</span><br><span class="line"> public static void loop() &#123;</span><br><span class="line">     final Looper me = myLooper();//得到当前线程对应的Looper对象</span><br><span class="line">     if (me == null) &#123;</span><br><span class="line">         throw new RuntimeException(&quot;No Looper; Looper.prepare() wasn&apos;t called on this thread.&quot;);</span><br><span class="line">     &#125;</span><br><span class="line">     final MessageQueue queue = me.mQueue;</span><br><span class="line">     ……</span><br><span class="line">     for (; ; ) &#123;</span><br><span class="line">         Message msg = queue.next(); // 可能产生线程阻塞</span><br><span class="line">         if (msg == null) &#123;</span><br><span class="line">             // 如果msg是null，表示消息队列正在退出或者已经被废弃</span><br><span class="line">             return;</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         ……（打印日志）</span><br><span class="line">         //执行msg绑定的Runnable 或者 调用target的handleMessage()</span><br><span class="line">         msg.target.dispatchMessage(msg);</span><br><span class="line">         ……（打印日志）</span><br><span class="line">         //不检查状态，直接回收消息</span><br><span class="line">         msg.recycleUnchecked();</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
@@ -351,7 +383,7 @@ E/AndroidRuntime(4507):android.view.ViewRootImpl$CalledFromWro">
 <p><strong>11.退出消息循环</strong><br>&emsp;&emsp;当确定线程间的通信已经全部结束后，我们需要退出接收线程的消息循环。这个时候因为接收线程还在执行loop()方法，所以我们需要从其他线程退出或者往其中发送一个消息通知其退出（需要自定义）。<br>&emsp;&emsp;退出消息循环需要调用Looper类的成员方法quit()/quitSafely()：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">    *  终止Looper。如想安全终止Looper，请参考lI.quitSafely()</span><br><span class="line">    * &lt;p&gt;调用该方法将会使得loop(）在下一次循环时立刻终止，无论终止时MessageQueue中是否还有尚未处</span><br><span class="line">    * 理的消息。这之后无论以何种方式发布（post）消息都将会失败，譬如Handler#sendMessage(Message)会</span><br><span class="line">    * 返回false。&lt;/p&gt;</span><br><span class="line">    * &lt;p&gt;</span><br><span class="line">    * 调用这个方法时，可能有一些消息在Looper终止前都不会被交付（delivery） ，因而这个方法并不安全。</span><br><span class="line">    * 考虑使用&#123;@link #quitSafely&#125;方法替代，从而保证所有本应执行完的工作能够有条不紊地执行完再结束Looper。</span><br><span class="line">    * &lt;/p&gt;</span><br><span class="line">    */</span><br><span class="line">   public void quit() &#123;</span><br><span class="line">       mQueue.quit(false);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   /**</span><br><span class="line">    * 安全地终止Looper。</span><br><span class="line">    * 调用该方法后，截止调用时刻的所有消息都能够如常被交付（delivery），而晚于该时刻的消息尽数被丢弃。</span><br><span class="line">    *  一旦处理完符合时刻的所有消息，loop()便会在下一次循环时终止。这之后无论以何种方式发布（post）消息都将</span><br><span class="line">    *  会失败，譬如Handler#sendMessage(Message)会返回false。</span><br><span class="line">    */</span><br><span class="line">   public void quitSafely() &#123;</span><br><span class="line">       mQueue.quit(true);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   void quit(boolean safe) &#123;</span><br><span class="line">       if (!mQuitAllowed) &#123;</span><br><span class="line">           throw new IllegalStateException(&quot;Main thread not allowed to quit.&quot;);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       synchronized (this) &#123;</span><br><span class="line">           if (mQuitting) &#123;</span><br><span class="line">               return;</span><br><span class="line">           &#125;</span><br><span class="line">           mQuitting = true;</span><br><span class="line"></span><br><span class="line">           if (safe) &#123;</span><br><span class="line">               removeAllFutureMessagesLocked();</span><br><span class="line">           &#125; else &#123;</span><br><span class="line">               removeAllMessagesLocked();</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">           // We can assume mPtr != 0 because mQuitting was previously false.</span><br><span class="line">           nativeWake(mPtr);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
 <p>&emsp;&emsp;quit()/quitSafely()会调用消息队列的quit()，该方法将会使得next()方法返回null。loop()在next()返回null时，会立即退出无线循环。至此，接收线程的Looper使命完结。接收线程执行完Looper.loop()后的代码之后，接收线程正式关闭。</p>
-<p> 补充篇：<a href="http://blog.csdn.net/tear2210/article/details/49931553" target="_blank" rel="external">Android线程间通信（补充）：UI线程</a></p>
+<p> 补充篇：<a href="/2015-11-20/handler-05-append/">Android线程间通信（补充）：UI线程</a></p>
 
       
     </div>
@@ -371,21 +403,27 @@ E/AndroidRuntime(4507):android.view.ViewRootImpl$CalledFromWro">
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/Android源码分析/" rel="tag">#Android源码分析</a>
+          
+        </div>
+      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016-05-15/hello-world/" rel="next" title="Hello Worldxxxxx">
-                <i class="fa fa-chevron-left"></i> Hello Worldxxxxx
+              <a href="/2015-10-28/synchronized-03/" rel="next" title="场景二：synchronized修饰方法">
+                <i class="fa fa-chevron-left"></i> 场景二：synchronized修饰方法
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016-05-15/Android线程间通信（二）：MessageQueue（上）/" rel="prev" title="">
-                 <i class="fa fa-chevron-right"></i>
+              <a href="/2015-11-18/handler-01-Message/" rel="prev" title="Android线程间通信（一）：Message">
+                Android线程间通信（一）：Message <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -454,7 +492,7 @@ E/AndroidRuntime(4507):android.view.ViewRootImpl$CalledFromWro">
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-count">9</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -462,7 +500,7 @@ E/AndroidRuntime(4507):android.view.ViewRootImpl$CalledFromWro">
           
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>

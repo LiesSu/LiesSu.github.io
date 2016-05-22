@@ -87,7 +87,7 @@
 <meta name="description" content="Material Design重度患者，分散学习主义.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="匠心奉孝">
-<meta property="og:url" content="http://yoursite.com/archives/2016/index.html">
+<meta property="og:url" content="http://yoursite.com/page/2/index.html">
 <meta property="og:site_name" content="匠心奉孝">
 <meta property="og:description" content="Material Design重度患者，分散学习主义.">
 <meta name="twitter:card" content="summary">
@@ -110,7 +110,7 @@
   };
 </script>
 
-  <title> 一览 | 匠心奉孝 </title>
+  <title> 匠心奉孝 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -131,7 +131,9 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  page-archive  ">
+  <div class="container one-collumn sidebar-position-left 
+   page-home 
+ ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -238,288 +240,152 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
+  <section id="posts" class="posts-expand">
+    
+      
 
-  <section id="posts" class="posts-collapse">
-    <span class="archive-move-on"></span>
+  
+  
 
-    <span class="archive-page-counter">
-      
-      
-      
-        
-      
-      嗯..! 目前共计 11 篇日志。 继续努力。
-    </span>
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
 
     
+      <header class="post-header">
 
-      
-      
-      
-
-      
         
-        <div class="collection-title">
-          <h2 class="archive-year motion-element" id="archive-year-2016">2016</h2>
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2015-10-28/synchronized-01/" itemprop="url">
+                  synchronized关键词使用场景解析
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2015-10-28T18:03:00+08:00" content="2015-10-28">
+              2015-10-28
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Java/进阶内容/" itemprop="url" rel="index">
+                    <span itemprop="name">进阶内容</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
         </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
       
       
 
       
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
         
-            <a class="post-title-link" href="/2016-05-15/Android线程间通信（三）：Looper/" itemprop="url">
-              
-                <span itemprop="name">未命名</span>
-              
+          <h1 id="synchronized使用场景"><a href="#synchronized使用场景" class="headerlink" title="synchronized使用场景"></a>synchronized使用场景</h1><hr>
+<ol>
+<li>synchronized包裹代码块：<br> I   . synchronized(对象){}<br> II . synchronized(类名.class){}<br> III. synchronized(this){}</li>
+<li>synchronized修饰方法：<br> I .public synchronized void  memberMethod(){};<br> II.public static synchronized void staticMethod(){};</li>
+</ol>
+<hr>
+<h2 id="相关赘述"><a href="#相关赘述" class="headerlink" title="相关赘述"></a><strong>相关赘述</strong></h2><blockquote>
+<p>内置锁：每个java对象都可以用做一个实现同步的锁，这些锁成为内置锁。线程进入同步代码块或方法的时候会自动获得该锁，在退出同步代码块或方法时会释放该锁。获得内置锁的唯一途径就是进入这个锁的保护的同步代码块或方法。– <a href="http://zhh9106.iteye.com/blog/2151791">查看出处</a></p>
+<p>对象锁：假设类对象instance的某段代码块被synchronized(obj){}包裹，线程访问该段代码块时便会拿到obj对象的内置锁。在obj对象的内置锁释放前，其他线程仍然可以访问instance对象非同步的方法和代码块（现象一），但是：<br>  1. 不能进入任何也以obj为锁的代码块；（现象二）<br>  2. 当obj与instance是同一个对象时，也不能进入任何instance对象的同步方法（现象三）<br>  由此可见，第一个线程拿到obj对象的内置锁其实就相当于给instance这个对象加上了一个用于同步的独占排他锁（可重入），我们称obj对象为对象锁。– <a href="../synchronized-02/index.html">查看详情</a></p>
+<p>类锁：是相对于对象锁而抽象出来的一种独占排他锁。当线程拿到一个类A的类锁时，其他线程无法访问以类A为锁(A.class)的同步代码块，也无法进入类A的所有静态同步方法。– <a href="../synchronized-02/index.html">查看详情</a></p>
+</blockquote>
+<hr>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015-10-28/synchronized-01/#more" rel="contents">
+              阅读全文 &raquo;
             </a>
+          </div>
         
-      </h1>
+      
+    </div>
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-05-15T19:47:24+08:00"
-              content="2016-05-15" >
-          05-15
-        </time>
-      </div>
+    <div>
+      
+    </div>
 
-    </header>
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
   </article>
 
 
-
     
-
-      
-      
-      
-
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016-05-15/Android线程间通信（补充）：UI线程/" itemprop="url">
-              
-                <span itemprop="name">未命名</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-05-15T19:47:24+08:00"
-              content="2016-05-15" >
-          05-15
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
-      
-      
-      
-
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016-05-15/Android线程间通信（四）：Handler/" itemprop="url">
-              
-                <span itemprop="name">未命名</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-05-15T19:47:24+08:00"
-              content="2016-05-15" >
-          05-15
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
-      
-      
-      
-
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016-05-15/Android线程间通信（二）：MessageQueue（中）/" itemprop="url">
-              
-                <span itemprop="name">未命名</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-05-15T19:47:24+08:00"
-              content="2016-05-15" >
-          05-15
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
-      
-      
-      
-
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016-05-15/Android线程间通信（二）：MessageQueue（上）/" itemprop="url">
-              
-                <span itemprop="name">未命名</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-05-15T19:47:24+08:00"
-              content="2016-05-15" >
-          05-15
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
-      
-      
-      
-
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016-05-15/Android线程间通信（总）/" itemprop="url">
-              
-                <span itemprop="name">未命名</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-05-15T19:47:24+08:00"
-              content="2016-05-15" >
-          05-15
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
-      
-      
-      
-
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016-05-15/hello-world/" itemprop="url">
-              
-                <span itemprop="name">Hello Worldxxxxx</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-05-15T11:26:16+08:00"
-              content="2016-05-15" >
-          05-15
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
   </section>
 
   
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+  </nav>
 
 
 
@@ -694,12 +560,6 @@
   
 
   
-  
-    <script type="text/javascript" id="motion.page.archive">
-      $('.archive-year').velocity('transition.slideLeftIn');
-    </script>
-  
-
 
   
 
